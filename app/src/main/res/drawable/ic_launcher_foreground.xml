@@ -1,0 +1,185 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- HUD Corner Reticle Brackets (Stay comfortably within safe 66dp circle) -->
+    <!-- Top-Left Cyan Bracket -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#AA00F0FF"
+        android:strokeWidth="1.8"
+        android:pathData="M34,26 L26,26 L26,34" />
+
+    <!-- Top-Right Magenta Bracket -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#AAFF007F"
+        android:strokeWidth="1.8"
+        android:pathData="M74,26 L82,26 L82,34" />
+
+    <!-- Bottom-Left Magenta Bracket -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#AAFF007F"
+        android:strokeWidth="1.8"
+        android:pathData="M26,74 L26,82 L34,82" />
+
+    <!-- Bottom-Right Cyan Bracket -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#AA00F0FF"
+        android:strokeWidth="1.8"
+        android:pathData="M82,74 L82,82 L74,82" />
+
+    <!-- Trailing Cyber Speed Trails (Energy streaks behind sprinting runner) -->
+    <!-- Speed Trail 1 - Cyan Top Streak -->
+    <path
+        android:pathData="M22,39 L47,39 L44,42 L22,42 Z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:type="linear"
+                android:startX="22"
+                android:startY="40.5"
+                android:endX="47"
+                android:endY="40.5">
+                <item android:offset="0.0" android:color="#0000F0FF" />
+                <item android:offset="1.0" android:color="#CC00F0FF" />
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <!-- Speed Trail 2 - Magenta Core Burst Streak -->
+    <path
+        android:pathData="M18,48 L50,48 L46,52 L18,52 Z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:type="linear"
+                android:startX="18"
+                android:startY="50"
+                android:endX="50"
+                android:endY="50">
+                <item android:offset="0.0" android:color="#00FF007F" />
+                <item android:offset="1.0" android:color="#EEFF007F" />
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <!-- Speed Trail 3 - Cyan Lower Drive Streak -->
+    <path
+        android:pathData="M24,57 L45,57 L41,60 L24,60 Z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:type="linear"
+                android:startX="24"
+                android:startY="58.5"
+                android:endX="45"
+                android:endY="58.5">
+                <item android:offset="0.0" android:color="#0000F0FF" />
+                <item android:offset="1.0" android:color="#BB00F0FF" />
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <!-- Additional Fast Cyber Dashes -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#8800F0FF"
+        android:strokeWidth="1.2"
+        android:pathData="M16,44 L28,44" />
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#88FF007F"
+        android:strokeWidth="1.2"
+        android:pathData="M14,54 L26,54" />
+
+    <!-- RUNNER SILHOUETTE & CYBER ARMOR -->
+
+    <!-- Trailing Left Arm (Back drive) -->
+    <path
+        android:fillColor="#151928"
+        android:strokeColor="#FF007F"
+        android:strokeWidth="1.2"
+        android:pathData="M52,43 L42,37 L36,42 L39,44 L44,40 L53,46 Z" />
+
+    <!-- Trailing Left Leg (Full athletic stride extension) -->
+    <path
+        android:fillColor="#121626"
+        android:strokeColor="#FF007F"
+        android:strokeWidth="1.3"
+        android:pathData="M48,55 L38,62 L30,67 L32,71 L42,65 L50,58 Z" />
+    <!-- Rear Thruster Jet Flare -->
+    <path
+        android:fillColor="#FFFF007F"
+        android:pathData="M29,68 L22,70 L28,73 Z" />
+
+    <!-- Runner Torso / Exoskeleton Core -->
+    <path
+        android:fillColor="#0E1220"
+        android:strokeColor="#00F0FF"
+        android:strokeWidth="1.5"
+        android:pathData="M56,40 L64,45 L55,59 L48,55 Z" />
+
+    <!-- Torso Neon Power Core / Fracture Stripe -->
+    <path
+        android:fillColor="#FFFF007F"
+        android:pathData="M56,44 L60,47 L54,55 L51,52 Z" />
+
+    <!-- Leading High-Stride Right Leg (Knee driving forward) -->
+    <path
+        android:fillColor="#151B2E"
+        android:strokeColor="#00F0FF"
+        android:strokeWidth="1.4"
+        android:pathData="M52,56 L64,58 L63,69 L68,74 L64,75 L59,69 L61,62 L50,59 Z" />
+    <!-- Front Foot Thruster Spark -->
+    <path
+        android:fillColor="#FF00F0FF"
+        android:pathData="M66,74 L71,77 L65,77 Z" />
+
+    <!-- Leading Right Arm (Pumping forward in sprint) -->
+    <path
+        android:fillColor="#181F33"
+        android:strokeColor="#00F0FF"
+        android:strokeWidth="1.3"
+        android:pathData="M59,43 L67,49 L75,45 L74,42 L67,46 L59,40 Z" />
+
+    <!-- Cyber Gauntlet Neon Accent -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="1.0"
+        android:pathData="M69,47 L74,44" />
+
+    <!-- Aerodynamic Cyber Helmet Shell -->
+    <path
+        android:fillColor="#0E1322"
+        android:strokeColor="#00F0FF"
+        android:strokeWidth="1.5"
+        android:pathData="M57,32 L67,35 L65,42 L57,41 L54,36 Z" />
+
+    <!-- Glowing Cyber Visor Slit (Cyan with White Core) -->
+    <path
+        android:fillColor="#FF00F0FF"
+        android:pathData="M59,36 L68,38 L67,40 L58,38 Z" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M61,37 L67,38.5 L66,39.5 L60,38 Z" />
+
+    <!-- "NEON RUN" High-Tech Typography Accent at Base -->
+    <!-- Sleek Stylized "N R" Monogram at center bottom (y=77..81) -->
+    <!-- "N" -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#00F0FF"
+        android:strokeWidth="1.2"
+        android:pathData="M43,81 L43,76 L48,81 L48,76" />
+    <!-- "R" -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#FF007F"
+        android:strokeWidth="1.2"
+        android:pathData="M52,81 L52,76 L56,76 C57.5,76 57.5,78.5 56,78.5 L52,78.5 M55,78.5 L57,81" />
+
+</vector>
