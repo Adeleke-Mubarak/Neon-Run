@@ -29,7 +29,7 @@ class TrackSegment(val segmentIndex: Int) {
 
     var type: SegmentType = SegmentType.METRO_STRAIGHT
     var fractureType: FractureType = FractureType.NONE
-    var biomeType: BiomeType = BiomeType.SUBWAY_DEPOT
+    var biomeType: BiomeType = BiomeType.CITY_STREETS
     var isTransitionGateway: Boolean = false
 
     var elevationStart: Float = 0.0f
@@ -50,7 +50,7 @@ class TrackSegment(val segmentIndex: Int) {
         startZ: Float,
         type: SegmentType = SegmentType.METRO_STRAIGHT,
         fractureType: FractureType = FractureType.NONE,
-        biomeType: BiomeType = BiomeType.SUBWAY_DEPOT,
+        biomeType: BiomeType = BiomeType.CITY_STREETS,
         isTransitionGateway: Boolean = false
     ) {
         this.startZ = startZ
@@ -160,7 +160,7 @@ class TrackSegment(val segmentIndex: Int) {
             SegmentType.FRACTURE_OVERPASS_RAMP_DOWN -> rampDownRoadMesh.render(shader)
             else -> {
                 when (biomeType) {
-                    BiomeType.SUBWAY_DEPOT -> subwayRoadMesh.render(shader)
+                    BiomeType.CITY_STREETS -> subwayRoadMesh.render(shader)
                     BiomeType.DESERT_CANYON -> canyonRoadMesh.render(shader)
                     BiomeType.OVERGROWN_RUINS -> ruinsRoadMesh.render(shader)
                     BiomeType.ORBITAL_SKYDECK -> orbitalRoadMesh.render(shader)
@@ -174,7 +174,7 @@ class TrackSegment(val segmentIndex: Int) {
             SegmentType.METRO_STRAIGHT -> {
                 if (renderSceneryBuildings) {
                     when (biomeType) {
-                        BiomeType.SUBWAY_DEPOT -> subwaySceneryMesh.render(shader)
+                        BiomeType.CITY_STREETS -> subwaySceneryMesh.render(shader)
                         BiomeType.DESERT_CANYON -> canyonSceneryMesh.render(shader)
                         BiomeType.OVERGROWN_RUINS -> ruinsSceneryMesh.render(shader)
                         BiomeType.ORBITAL_SKYDECK -> orbitalSceneryMesh.render(shader)
@@ -190,7 +190,7 @@ class TrackSegment(val segmentIndex: Int) {
             SegmentType.OVERPASS_GANTRY -> {
                 if (renderSceneryBuildings) {
                     when (biomeType) {
-                        BiomeType.SUBWAY_DEPOT -> subwaySceneryMesh.render(shader)
+                        BiomeType.CITY_STREETS -> subwaySceneryMesh.render(shader)
                         BiomeType.DESERT_CANYON -> canyonSceneryMesh.render(shader)
                         BiomeType.OVERGROWN_RUINS -> ruinsSceneryMesh.render(shader)
                         BiomeType.ORBITAL_SKYDECK -> orbitalSceneryMesh.render(shader)
@@ -205,7 +205,7 @@ class TrackSegment(val segmentIndex: Int) {
                 fractureSplitDecorMesh.render(shader)
                 if (renderSceneryBuildings) {
                     when (biomeType) {
-                        BiomeType.SUBWAY_DEPOT -> subwaySceneryMesh.render(shader)
+                        BiomeType.CITY_STREETS -> subwaySceneryMesh.render(shader)
                         BiomeType.DESERT_CANYON -> canyonSceneryMesh.render(shader)
                         BiomeType.OVERGROWN_RUINS -> ruinsSceneryMesh.render(shader)
                         BiomeType.ORBITAL_SKYDECK -> orbitalSceneryMesh.render(shader)
@@ -221,7 +221,7 @@ class TrackSegment(val segmentIndex: Int) {
                 gantryMesh.render(shader)
                 if (renderSceneryBuildings) {
                     when (biomeType) {
-                        BiomeType.SUBWAY_DEPOT -> subwaySceneryMesh.render(shader)
+                        BiomeType.CITY_STREETS -> subwaySceneryMesh.render(shader)
                         BiomeType.DESERT_CANYON -> canyonSceneryMesh.render(shader)
                         BiomeType.OVERGROWN_RUINS -> ruinsSceneryMesh.render(shader)
                         BiomeType.ORBITAL_SKYDECK -> orbitalSceneryMesh.render(shader)

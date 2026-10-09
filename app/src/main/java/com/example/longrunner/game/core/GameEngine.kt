@@ -140,7 +140,6 @@ class GameEngine(val context: Context? = null) {
 
         worldEventManager.onEventWarning = { event ->
             when (event) {
-                WorldEventType.CITY_BLACKOUT -> soundManager.playBlackoutWarning()
                 WorldEventType.DRONE_SWARM -> soundManager.playDroneAlarm()
                 WorldEventType.REALITY_FRACTURE -> soundManager.playRealityGlitch()
                 WorldEventType.NONE -> {}
@@ -150,11 +149,7 @@ class GameEngine(val context: Context? = null) {
         worldEventManager.onEventStarted = { _ ->
             notifyStats()
         }
-        worldEventManager.onEventEnded = { event ->
-            if (event == WorldEventType.CITY_BLACKOUT) {
-                missionManager.addProgress(MissionType.SURVIVE_BLACKOUTS, 1)
-                achievementManager.unlock(AchievementId.BLACKOUT_NINJA)
-            }
+        worldEventManager.onEventEnded = { _ ->
             notifyStats()
         }
 
@@ -427,7 +422,7 @@ class GameEngine(val context: Context? = null) {
         // Update procedural track
         trackGenerator.update(player, effectiveDt)
 
-        // Update dynamic world events (Blackouts, Drone Swarms, Glitches)
+        // Update dynamic world events (Drone Swarms, Glitches)
         worldEventManager.update(player.z, effectiveDt)
 
         // Update The Null pursuit entity

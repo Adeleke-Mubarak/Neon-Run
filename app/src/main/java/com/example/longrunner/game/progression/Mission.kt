@@ -9,11 +9,16 @@ enum class MissionType(val displayName: String) {
     COMBO_TARGET("Combo Multiplier"),
     NEAR_MISS_COUNT("Near Miss Dodges"),
     SURVIVE_FRACTURES("Fractures Cleared"),
-    SURVIVE_BLACKOUTS("Blackouts Survived"),
+    SURVIVE_DRONE_SWARMS("Drone Swarms Survived"),
     ACTIVATE_ABILITY("Ability Activations"),
     ACTIVATE_PHASE_SHIFT("Phase Shift Transitions"),
     REPEL_NULL("Repel The Null"),
-    SMASH_CRATES("Crates Smashed")
+    SMASH_CRATES("Crates Smashed");
+
+    companion object {
+        @JvmField
+        val SURVIVE_BLACKOUTS = SURVIVE_DRONE_SWARMS
+    }
 }
 
 enum class MissionTier(val displayName: String, val badgeColorHex: Long) {

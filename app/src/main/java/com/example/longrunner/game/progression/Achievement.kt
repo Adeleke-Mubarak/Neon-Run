@@ -10,7 +10,12 @@ enum class AchievementId {
     PHASE_ARCHITECT,     // Spend 30s total in Phase Shift
     NEAR_MISS_SURGEON,   // Perform 10 near misses in one run
     ENDLESS_RUNNER,      // Travel 2,000m in a single run
-    BLACKOUT_NINJA       // Survive a City Blackout without colliding
+    SWARM_EVADER;        // Survive a Drone Swarm without colliding
+
+    companion object {
+        @JvmField
+        val BLACKOUT_NINJA = SWARM_EVADER
+    }
 }
 
 data class Achievement(

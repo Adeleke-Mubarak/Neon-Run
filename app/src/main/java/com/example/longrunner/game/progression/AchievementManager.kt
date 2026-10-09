@@ -31,7 +31,7 @@ class AchievementManager(context: Context? = null) {
             Achievement(AchievementId.PHASE_ARCHITECT, "Phase Maestro", "Activate Phase Shift 15 times", "🌀", 450, 160),
             Achievement(AchievementId.NEAR_MISS_SURGEON, "Hair's Breadth", "Execute 10 Near Misses in a single run", "🎯", 450, 180),
             Achievement(AchievementId.ENDLESS_RUNNER, "Endless Instinct", "Survive past 2,000 meters in a single run", "🏆", 800, 350),
-            Achievement(AchievementId.BLACKOUT_NINJA, "Shadow Ghost", "Survive a City Blackout event without collision", "🌃", 500, 200)
+            Achievement(AchievementId.SWARM_EVADER, "Swarm Evader", "Survive a Drone Swarm event without collision", "🛸", 500, 200)
         )
 
         _achievements.clear()

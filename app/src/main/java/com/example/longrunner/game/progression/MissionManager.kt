@@ -192,7 +192,7 @@ class MissionManager(
             MissionTier.GOLD -> {
                 val templates = listOf(
                     Mission(id, "Grand Circuit", "Cover 3,500 meters total across runs", MissionType.DISTANCE_TOTAL, tier, 3500, 0, false, false, 500, 220),
-                    Mission(id, "Grid Survivor", "Survive a City Blackout event", MissionType.SURVIVE_BLACKOUTS, tier, 1, 0, false, false, 480, 200),
+                    Mission(id, "Swarm Survivor", "Survive a Drone Swarm event", MissionType.SURVIVE_DRONE_SWARMS, tier, 1, 0, false, false, 480, 200),
                     Mission(id, "Acrobatic Ace", "Execute 15 Near Misses", MissionType.NEAR_MISS_COUNT, tier, 15, 0, false, false, 520, 230),
                     Mission(id, "Apex Multiplier", "Reach an 8x Combo Multiplier", MissionType.COMBO_TARGET, tier, 8, 0, false, false, 550, 250),
                     Mission(id, "Operative Overclock", "Activate character abilities 6 times", MissionType.ACTIVATE_ABILITY, tier, 6, 0, false, false, 460, 190)

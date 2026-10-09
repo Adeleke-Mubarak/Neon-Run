@@ -242,7 +242,6 @@ class Renderer3D(
 
         // Set global lighting and cyber fog with phase shift chromatic distortion & biome atmosphere
         activeShader.setPhaseFrequency(phaseTransition)
-        activeShader.setBlackoutFactor(engine.worldEventManager.blackoutFactor)
         activeShader.setGlitchFactor(
             if (engine.settingsManager.isGlitchShaderEnabled) engine.worldEventManager.glitchFactor else 0f
         )

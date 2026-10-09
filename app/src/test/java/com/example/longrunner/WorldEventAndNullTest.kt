@@ -17,7 +17,6 @@ class WorldEventAndNullTest {
         assertFalse(manager.isEventActive)
         assertFalse(manager.isWarningActive)
         assertEquals(0f, manager.eventProgress, 0.001f)
-        assertEquals(0f, manager.blackoutFactor, 0.001f)
         assertEquals(0f, manager.glitchFactor, 0.001f)
         assertEquals(0f, manager.searchlightX, 0.001f)
     }
@@ -31,10 +30,10 @@ class WorldEventAndNullTest {
         manager.onEventStarted = { startedEvent = it }
         manager.onEventEnded = { endedEvent = it }
 
-        manager.triggerEvent(WorldEventType.CITY_BLACKOUT, duration = 10.0f)
+        manager.triggerEvent(WorldEventType.DRONE_SWARM, duration = 10.0f)
         assertTrue(manager.isEventActive)
-        assertEquals(WorldEventType.CITY_BLACKOUT, manager.currentEvent)
-        assertEquals(WorldEventType.CITY_BLACKOUT, startedEvent)
+        assertEquals(WorldEventType.DRONE_SWARM, manager.currentEvent)
+        assertEquals(WorldEventType.DRONE_SWARM, startedEvent)
         assertEquals(10.0f, manager.totalDuration, 0.001f)
         assertEquals(1.0f, manager.progress, 0.001f)
 
@@ -48,22 +47,12 @@ class WorldEventAndNullTest {
         manager.update(playerZ = 0f, dt = 6.5f)
         assertFalse(manager.isEventActive)
         assertEquals(WorldEventType.NONE, manager.currentEvent)
-        assertEquals(WorldEventType.CITY_BLACKOUT, endedEvent)
+        assertEquals(WorldEventType.DRONE_SWARM, endedEvent)
     }
 
     @Test
     fun testWorldEventTransitionsAndVisualFactors() {
         val manager = WorldEventManager()
-
-        // Test Blackout factor ramping up
-        manager.triggerEvent(WorldEventType.CITY_BLACKOUT, duration = 12.0f)
-        manager.update(playerZ = 0f, dt = 0.5f)
-        assertTrue("Blackout factor should ramp up", manager.blackoutFactor > 0.3f)
-
-        // End event and verify factor decays towards 0
-        manager.endEvent()
-        manager.update(playerZ = 0f, dt = 2.0f)
-        assertTrue("Blackout factor should decay towards 0", manager.blackoutFactor < 0.2f)
 
         // Test Drone Swarm searchlight oscillation
         manager.triggerEvent(WorldEventType.DRONE_SWARM, duration = 10.0f)

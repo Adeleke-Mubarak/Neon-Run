@@ -20,7 +20,6 @@ class Shader(vertexSource: String, fragmentSource: String) {
     val uFogDensityLocation: Int
     val uCameraPosLocation: Int
     val uPhaseFrequencyLocation: Int
-    val uBlackoutFactorLocation: Int
     val uGlitchFactorLocation: Int
 
     init {
@@ -59,7 +58,6 @@ class Shader(vertexSource: String, fragmentSource: String) {
         uFogDensityLocation = GLES30.glGetUniformLocation(programId, "u_FogDensity")
         uCameraPosLocation = GLES30.glGetUniformLocation(programId, "u_CameraPos")
         uPhaseFrequencyLocation = GLES30.glGetUniformLocation(programId, "u_PhaseFrequency")
-        uBlackoutFactorLocation = GLES30.glGetUniformLocation(programId, "u_BlackoutFactor")
         uGlitchFactorLocation = GLES30.glGetUniformLocation(programId, "u_GlitchFactor")
     }
 
@@ -100,10 +98,6 @@ class Shader(vertexSource: String, fragmentSource: String) {
 
     fun setPhaseFrequency(frequency: Float) {
         GLES30.glUniform1f(uPhaseFrequencyLocation, frequency)
-    }
-
-    fun setBlackoutFactor(blackout: Float) {
-        GLES30.glUniform1f(uBlackoutFactorLocation, blackout)
     }
 
     fun setGlitchFactor(glitch: Float) {
@@ -174,26 +168,20 @@ uniform vec3 u_FogColor;
 uniform float u_FogDensity;
 uniform vec3 u_CameraPos;
 uniform float u_PhaseFrequency;
-uniform float u_BlackoutFactor;
 uniform float u_GlitchFactor;
 
 out vec4 fragColor;
 
 void main() {
-    // Normal lighting
+    // Directional + Ambient lighting
     vec3 normal = normalize(v_Normal);
     vec3 lightDir = normalize(u_LightDir);
     float diff = max(dot(normal, lightDir), 0.0);
     
-    // Ambient + Diffuse with blackout dimming
-    vec3 normalLighting = u_AmbientColor + (u_LightColor * diff);
-    vec3 blackoutLighting = vec3(0.04, 0.04, 0.08) + (vec3(0.15, 0.18, 0.25) * diff);
-    vec3 lighting = mix(normalLighting, blackoutLighting, clamp(u_BlackoutFactor, 0.0, 1.0));
+    vec3 lighting = u_AmbientColor + (u_LightColor * diff);
     
-    // Emissive glow blend: In blackout, emissive neon highlights pop aggressively
     vec3 baseColor = v_Color.rgb;
-    float effectiveEmissive = max(u_Emissive, u_BlackoutFactor * u_Emissive * 1.6);
-    vec3 litColor = mix(baseColor * lighting, baseColor * 1.35, effectiveEmissive);
+    vec3 litColor = mix(baseColor * lighting, baseColor * 1.15, u_Emissive);
     
     // Phase Reality chromatic frequency shift
     vec3 phaseColor = vec3(litColor.b * 1.15, litColor.r * 0.35 + litColor.g * 0.25, litColor.r * 0.85 + litColor.b * 0.85);
@@ -206,13 +194,12 @@ void main() {
         litColor = mix(litColor, glitchColor, glitchStripe * u_GlitchFactor * 0.75);
     }
     
-    // Distance Fog (fog is darker in blackout)
+    // Distance Fog
     float dist = length(v_Position - u_CameraPos);
     float fogFactor = exp(-pow(dist * u_FogDensity, 2.0));
     fogFactor = clamp(fogFactor, 0.0, 1.0);
     
-    vec3 effectiveFogColor = mix(u_FogColor, vec3(0.01, 0.01, 0.03), clamp(u_BlackoutFactor, 0.0, 1.0));
-    vec3 finalColor = mix(effectiveFogColor, litColor, fogFactor);
+    vec3 finalColor = mix(u_FogColor, litColor, fogFactor);
     fragColor = vec4(finalColor, v_Color.a);
 }
 """

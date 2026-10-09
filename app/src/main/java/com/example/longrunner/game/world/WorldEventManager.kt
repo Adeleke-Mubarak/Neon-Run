@@ -11,7 +11,6 @@ enum class WorldEventType(
     val defaultDuration: Float
 ) {
     NONE("Normal Operations", "", "", 0f),
-    CITY_BLACKOUT("CITY BLACKOUT", "GRID OFFLINE // NEON RUNTIME ACTIVE", "⚡", 15.0f),
     DRONE_SWARM("DRONE SWARM", "HOSTILE AIRSPACE // SCANNER SWEEP ACTIVE", "🚨", 14.0f),
     REALITY_FRACTURE("REALITY FRACTURE", "QUANTUM GLITCH // HIGH RISK EXTRACTION", "🌀", 13.0f)
 }
@@ -44,9 +43,6 @@ class WorldEventManager(private val random: Random = Random.Default) {
         private set
 
     // Visual shader parameters
-    var blackoutFactor: Float = 0f
-        private set
-
     var glitchFactor: Float = 0f
         private set
 
@@ -83,7 +79,6 @@ class WorldEventManager(private val random: Random = Random.Default) {
         isWarningActive = false
         warningTimer = 0f
         nextEventDistance = 350.0f
-        blackoutFactor = 0f
         glitchFactor = 0f
         searchlightX = 0f
     }
@@ -118,9 +113,8 @@ class WorldEventManager(private val random: Random = Random.Default) {
 
         // 1. Check distance trigger for upcoming world event warning (3.0s in advance)
         if (!isEventActive && !isWarningActive && distance >= nextEventDistance - 50.0f) {
-            // Pick next random event (rotate through BLACKOUT, DRONE_SWARM, REALITY_FRACTURE)
+            // Pick next random event (rotate through DRONE_SWARM, REALITY_FRACTURE)
             val events = listOf(
-                WorldEventType.CITY_BLACKOUT,
                 WorldEventType.DRONE_SWARM,
                 WorldEventType.REALITY_FRACTURE
             )
@@ -150,9 +144,6 @@ class WorldEventManager(private val random: Random = Random.Default) {
         }
 
         // 4. Smooth transitions for shader uniforms & searchlights
-        val targetBlackout = if (currentEvent == WorldEventType.CITY_BLACKOUT) 1.0f else 0f
-        blackoutFactor += (targetBlackout - blackoutFactor) * (dt * 3.5f).coerceAtMost(1.0f)
-
         val targetGlitch = if (currentEvent == WorldEventType.REALITY_FRACTURE) {
             // Pulsing glitch intensity with bursts
             (0.5f + 0.5f * sin(eventTimer * 12.0f)).coerceIn(0.1f, 1.0f)

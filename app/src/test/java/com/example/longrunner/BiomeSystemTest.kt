@@ -26,10 +26,10 @@ class BiomeSystemTest {
         val biomes = BiomeData.ALL
         assertEquals(4, biomes.size)
 
-        // Zone 1: Metro Transit & Rail Depot
+        // Zone 1: Urban City Streets & Highway
         assertEquals(BiomeType.SUBWAY_DEPOT, biomes[0].type)
         assertEquals(1, biomes[0].zoneNumber)
-        assertEquals("METRO TRANSIT", biomes[0].name)
+        assertEquals("URBAN CITY STREETS", biomes[0].name)
         assertEquals(0f, biomes[0].minDistance, 0.01f)
         assertEquals(900f, biomes[0].maxDistance, 0.01f)
 
@@ -119,7 +119,7 @@ class BiomeSystemTest {
     fun testBiomeManagerBannerTriggersOnZoneEntry() {
         // Start in Zone 1
         biomeManager.update(0f, 0.1f)
-        assertEquals("METRO TRANSIT", biomeManager.currentBiomeName)
+        assertEquals("URBAN CITY STREETS", biomeManager.currentBiomeName)
         assertEquals("", biomeManager.biomeBannerMessage)
 
         // Cross into Zone 2 (Rustfall Canyon)
@@ -139,9 +139,9 @@ class BiomeSystemTest {
     fun testTrackGeneratorAssignsBiomesToSegments() {
         engine.trackGenerator.reset()
 
-        // First segment should be in Zone 1 (Metro Transit)
+        // First segment should be in Zone 1 (Urban City Streets)
         val firstSegment = engine.trackGenerator.segments.first()
-        assertEquals(BiomeType.SUBWAY_DEPOT, firstSegment.biomeType)
+        assertEquals(BiomeType.CITY_STREETS, firstSegment.biomeType)
 
         // Recycle segments until track extends past 900m into Zone 2
         engine.player.teleport(0f, 0f, -1400f)
@@ -167,7 +167,7 @@ class BiomeSystemTest {
 
         engine.notifyStats()
         assertEquals(1, observedZone)
-        assertEquals("METRO TRANSIT", observedName)
+        assertEquals("URBAN CITY STREETS", observedName)
 
         // Advance distance into Zone 2
         engine.scoreManager.addBonusScore(100L)
@@ -181,6 +181,6 @@ class BiomeSystemTest {
         // Engine reset resets back to Zone 1
         engine.reset()
         assertEquals(1, engine.biomeManager.getActiveBiome().zoneNumber)
-        assertEquals("METRO TRANSIT", engine.biomeManager.currentBiomeName)
+        assertEquals("URBAN CITY STREETS", engine.biomeManager.currentBiomeName)
     }
 }

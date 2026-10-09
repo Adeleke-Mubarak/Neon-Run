@@ -147,89 +147,234 @@ class MeshBuilder {
             return builder.build()
         }
 
-        fun createRoadSegment(width: Float, length: Float): Mesh {
+        fun createCityStreetRoadMesh(width: Float, length: Float): Mesh {
             val builder = MeshBuilder()
-            // Main dark asphalt surface (center at Z = -length/2)
+            // Main dark textured asphalt road surface (center at Z = -length/2)
             builder.addBox(0f, -0.1f, -length * 0.5f, width, 0.2f, length, Material.ROAD_ASPHALT)
 
-            // Neon lane divider markings (dashes along X = -1.1 and X = 1.1)
+            // Painted white dashed lane markings separating the 3 lanes (at X = -1.1 and X = 1.1)
             val dashLength = 4.0f
             val gapLength = 3.0f
             var curZ = 0.0f
             while (curZ > -length) {
                 val zCenter = curZ - dashLength * 0.5f
-                builder.addBox(-1.1f, 0.02f, zCenter, 0.14f, 0.04f, dashLength, Material.ROAD_LANE_CYAN)
-                builder.addBox(1.1f, 0.02f, zCenter, 0.14f, 0.04f, dashLength, Material.ROAD_LANE_CYAN)
+                builder.addBox(-1.1f, 0.02f, zCenter, 0.14f, 0.04f, dashLength, Material.ROAD_MARKING_WHITE)
+                builder.addBox(1.1f, 0.02f, zCenter, 0.14f, 0.04f, dashLength, Material.ROAD_MARKING_WHITE)
                 curZ -= (dashLength + gapLength)
             }
 
-            // Outer curbs glowing magenta
-            val curbWidth = 0.45f
-            val curbHeight = 0.35f
-            builder.addBox(-width * 0.5f - curbWidth * 0.5f, curbHeight * 0.5f, -length * 0.5f, curbWidth, curbHeight, length, Material.ROAD_CURB_MAGENTA)
-            builder.addBox(width * 0.5f + curbWidth * 0.5f, curbHeight * 0.5f, -length * 0.5f, curbWidth, curbHeight, length, Material.ROAD_CURB_MAGENTA)
+            // Road edge solid white fog lines at the outer lane boundaries
+            builder.addBox(-width * 0.48f, 0.015f, -length * 0.5f, 0.12f, 0.03f, length, Material.ROAD_MARKING_WHITE)
+            builder.addBox(width * 0.48f, 0.015f, -length * 0.5f, 0.12f, 0.03f, length, Material.ROAD_MARKING_WHITE)
+
+            // Raised concrete curbs
+            val curbWidth = 0.35f
+            val curbHeight = 0.28f
+            builder.addBox(-width * 0.5f - curbWidth * 0.5f, curbHeight * 0.5f, -length * 0.5f, curbWidth, curbHeight, length, Material.SIDEWALK_CURB)
+            builder.addBox(width * 0.5f + curbWidth * 0.5f, curbHeight * 0.5f, -length * 0.5f, curbWidth, curbHeight, length, Material.SIDEWALK_CURB)
+
+            // Broad concrete pedestrian sidewalks flanking the roadway
+            val sidewalkWidth = 3.2f
+            val sidewalkHeight = 0.22f
+            val leftSidewalkCenter = -width * 0.5f - curbWidth - sidewalkWidth * 0.5f
+            val rightSidewalkCenter = width * 0.5f + curbWidth + sidewalkWidth * 0.5f
+            builder.addBox(leftSidewalkCenter, sidewalkHeight * 0.5f, -length * 0.5f, sidewalkWidth, sidewalkHeight, length, Material.SIDEWALK_CONCRETE)
+            builder.addBox(rightSidewalkCenter, sidewalkHeight * 0.5f, -length * 0.5f, sidewalkWidth, sidewalkHeight, length, Material.SIDEWALK_CONCRETE)
+
+            // Sidewalk details: Trees in square planters, modern lampposts, and fire hydrants
+            val leftPavementX = -width * 0.5f - curbWidth - 1.2f
+            val rightPavementX = width * 0.5f + curbWidth + 1.2f
+
+            // Sidewalk Trees with trunks, leafy crowns, and stone planters at Z = -6.0f and Z = -22.0f
+            val treeZ = floatArrayOf(-6.0f, -22.0f)
+            for (z in treeZ) {
+                // Left tree: Planter box
+                builder.addBox(leftPavementX, 0.32f, z, 1.1f, 0.22f, 1.1f, Material.SIDEWALK_CURB)
+                // Tree trunk
+                builder.addBox(leftPavementX, 1.6f, z, 0.28f, 2.6f, 0.28f, Material.STREET_TREE_TRUNK)
+                // Tree leafy canopy foliage
+                builder.addBox(leftPavementX, 3.4f, z, 1.8f, 1.8f, 1.8f, Material.STREET_TREE_LEAVES)
+                builder.addBox(leftPavementX, 4.4f, z, 1.2f, 0.8f, 1.2f, Material.STREET_TREE_LEAVES)
+
+                // Right tree: Planter box
+                builder.addBox(rightPavementX, 0.32f, z, 1.1f, 0.22f, 1.1f, Material.SIDEWALK_CURB)
+                // Tree trunk
+                builder.addBox(rightPavementX, 1.6f, z, 0.28f, 2.6f, 0.28f, Material.STREET_TREE_TRUNK)
+                // Tree canopy
+                builder.addBox(rightPavementX, 3.4f, z, 1.8f, 1.8f, 1.8f, Material.STREET_TREE_LEAVES)
+                builder.addBox(rightPavementX, 4.4f, z, 1.2f, 0.8f, 1.2f, Material.STREET_TREE_LEAVES)
+            }
+
+            // Modern municipal streetlamps at Z = -14.0f
+            val lampZ = -14.0f
+            // Left streetlamp
+            builder.addBox(leftPavementX - 0.4f, 2.4f, lampZ, 0.16f, 4.8f, 0.16f, Material.STREET_METAL_DARK)
+            builder.addBox(leftPavementX, 4.8f, lampZ, 0.8f, 0.12f, 0.12f, Material.STREET_METAL_DARK)
+            builder.addBox(leftPavementX + 0.35f, 4.65f, lampZ, 0.35f, 0.18f, 0.24f, Material.STREET_LAMP_WARM)
+
+            // Right streetlamp
+            builder.addBox(rightPavementX + 0.4f, 2.4f, lampZ, 0.16f, 4.8f, 0.16f, Material.STREET_METAL_DARK)
+            builder.addBox(rightPavementX, 4.8f, lampZ, 0.8f, 0.12f, 0.12f, Material.STREET_METAL_DARK)
+            builder.addBox(rightPavementX - 0.35f, 4.65f, lampZ, 0.35f, 0.18f, 0.24f, Material.STREET_LAMP_WARM)
+
+            // Cast iron fire hydrant on right sidewalk at Z = -18.0f
+            builder.addBox(rightPavementX - 0.2f, 0.55f, -18.0f, 0.32f, 0.65f, 0.32f, Material.FIRE_HYDRANT_RED)
+            builder.addBox(rightPavementX - 0.2f, 0.82f, -18.0f, 0.46f, 0.14f, 0.22f, Material.FIRE_HYDRANT_RED)
 
             return builder.build()
         }
 
-        fun createBuildingScenery(): Mesh {
+        fun createRoadSegment(width: Float, length: Float): Mesh = createCityStreetRoadMesh(width, length)
+
+        fun createCityBuildingsSceneryMesh(): Mesh {
             val builder = MeshBuilder()
-            // Left towering cyber-skyscrapers with illuminated windows
-            builder.addBox(-9.5f, 9.0f, -15.0f, 6.0f, 18.0f, 12.0f, Material.BUILDING_DARK)
-            builder.addBox(-6.4f, 9.0f, -15.0f, 0.2f, 16.0f, 1.2f, Material.BUILDING_WINDOW_GLOW)
-            builder.addBox(-9.5f, 14.0f, -24.0f, 7.0f, 28.0f, 10.0f, Material.BUILDING_DARK)
 
-            // Right sleek holographic structures
-            builder.addBox(9.5f, 10.0f, -12.0f, 6.0f, 20.0f, 10.0f, Material.BUILDING_DARK)
-            builder.addBox(6.4f, 10.0f, -12.0f, 0.2f, 14.0f, 1.2f, Material.ROAD_LANE_CYAN)
-            builder.addBox(10.0f, 16.0f, -25.0f, 8.0f, 32.0f, 12.0f, Material.BUILDING_DARK)
+            // LEFT SIDE: Multi-Story Red-Brick Brownstone Apartment & Concrete Commercial Mid-Rise
+            // Building 1: 4-Story Red-Brick Brownstone Apartment (Z = -8.0f, X = -9.8f)
+            builder.addBox(-9.8f, 7.5f, -8.0f, 6.2f, 15.0f, 14.0f, Material.BUILDING_RED_BRICK)
+            // Flat rooftop parapet and tar roof
+            builder.addBox(-9.8f, 15.2f, -8.0f, 6.4f, 0.4f, 14.2f, Material.BUILDING_ROOF_TAR)
+            // Rooftop cedar water cistern tower
+            builder.addBox(-8.5f, 16.6f, -10.0f, 1.8f, 2.4f, 1.8f, Material.BUILDING_WATER_TOWER)
+            builder.addBox(-8.5f, 15.4f, -10.0f, 1.4f, 0.8f, 1.4f, Material.STREET_METAL_DARK) // Tank stilts
+
+            // Storefront on ground floor with blue canvas awning
+            builder.addBox(-6.6f, 2.8f, -8.0f, 0.8f, 0.25f, 6.0f, Material.BUILDING_AWNING_BLUE)
+            builder.addBox(-6.65f, 1.4f, -8.0f, 0.1f, 1.8f, 5.6f, Material.BUILDING_GLASS_WINDOW)
+
+            // Brownstone window rows (floors 2, 3, 4)
+            val windowZ = floatArrayOf(-12.0f, -9.5f, -6.5f, -4.0f)
+            val windowY = floatArrayOf(5.5f, 8.8f, 12.0f)
+            for (wy in windowY) {
+                for (wz in windowZ) {
+                    builder.addBox(-6.65f, wy, wz, 0.12f, 1.5f, 1.1f, Material.BUILDING_WINDOW_FRAME)
+                    builder.addBox(-6.62f, wy, wz, 0.10f, 1.3f, 0.9f, Material.BUILDING_GLASS_WINDOW)
+                }
+            }
+
+            // Building 2: Concrete Office High-Rise (Z = -22.0f, X = -10.5f)
+            builder.addBox(-10.5f, 13.0f, -22.0f, 7.5f, 26.0f, 13.0f, Material.BUILDING_CONCRETE_GREY)
+            val officeFloorY = floatArrayOf(4.0f, 8.5f, 13.0f, 17.5f, 22.0f)
+            for (fy in officeFloorY) {
+                builder.addBox(-6.7f, fy, -22.0f, 0.15f, 1.6f, 11.5f, Material.BUILDING_GLASS_WINDOW)
+            }
+
+            // RIGHT SIDE: Limestone Apartment, Bus Stop Shelter, and Commercial Tower
+            // Building 3: Beige Limestone Apartment (Z = -9.0f, X = 9.8f)
+            builder.addBox(9.8f, 8.0f, -9.0f, 6.2f, 16.0f, 13.0f, Material.BUILDING_STONE_BEIGE)
+            builder.addBox(9.8f, 16.2f, -9.0f, 6.4f, 0.4f, 13.2f, Material.BUILDING_ROOF_TAR)
+            // Red storefront canvas awning
+            builder.addBox(6.6f, 2.8f, -9.0f, 0.8f, 0.25f, 5.5f, Material.BUILDING_AWNING_RED)
+            builder.addBox(6.65f, 1.4f, -9.0f, 0.1f, 1.8f, 5.0f, Material.BUILDING_GLASS_WINDOW)
+
+            // Limestone apartment windows
+            val rWindowZ = floatArrayOf(-12.5f, -9.0f, -5.5f)
+            val rWindowY = floatArrayOf(5.5f, 9.0f, 12.5f)
+            for (wy in rWindowY) {
+                for (wz in rWindowZ) {
+                    builder.addBox(6.65f, wy, wz, 0.12f, 1.5f, 1.1f, Material.BUILDING_WINDOW_FRAME)
+                    builder.addBox(6.62f, wy, wz, 0.10f, 1.3f, 0.9f, Material.BUILDING_GLASS_WINDOW)
+                }
+            }
+
+            // Realistic Bus Stop Passenger Shelter on right sidewalk (at Z = -16.0f, X = 5.6f)
+            builder.addBox(5.6f, 2.4f, -16.0f, 1.8f, 0.15f, 3.6f, Material.STREET_METAL_DARK)
+            builder.addBox(6.4f, 1.2f, -16.0f, 0.1f, 2.4f, 3.4f, Material.BUS_SHELTER_GLASS)
+            builder.addBox(5.6f, 1.2f, -17.7f, 1.6f, 2.4f, 0.1f, Material.BUS_SHELTER_GLASS)
+            builder.addBox(5.6f, 0.5f, -16.0f, 0.5f, 0.1f, 2.4f, Material.STREET_TREE_TRUNK)
+
+            // Building 4: Modern Commercial Tower (Z = -24.0f, X = 10.5f)
+            builder.addBox(10.5f, 15.0f, -24.0f, 7.5f, 30.0f, 14.0f, Material.BUILDING_CONCRETE_GREY)
+            builder.addBox(8.5f, 30.8f, -22.0f, 2.4f, 1.4f, 3.0f, Material.STREET_METAL_DARK) // HVAC
+            val towerFloors = floatArrayOf(5.0f, 10.0f, 15.0f, 20.0f, 25.0f)
+            for (tf in towerFloors) {
+                builder.addBox(6.7f, tf, -24.0f, 0.15f, 1.8f, 12.0f, Material.BUILDING_GLASS_WINDOW)
+            }
 
             return builder.build()
         }
+
+        fun createBuildingScenery(): Mesh = createCityBuildingsSceneryMesh()
 
         /**
-         * Obstacle 1: Low Hurdle Barrier (Requires JUMP)
-         * Total height = 0.65m. Player jumps over.
+         * Obstacle 1: Municipal Construction Roadblock Barrier (Requires JUMP)
+         * Total height ~0.65m. Player jumps over.
          */
         fun createLowHurdle(): Mesh {
             val builder = MeshBuilder()
-            // Left & Right posts
-            builder.addBox(-0.85f, 0.35f, 0f, 0.18f, 0.7f, 0.18f, Material.BUILDING_DARK)
-            builder.addBox(0.85f, 0.35f, 0f, 0.18f, 0.7f, 0.18f, Material.BUILDING_DARK)
-            // Amber hazard crossbeam
-            builder.addBox(0f, 0.45f, 0f, 1.8f, 0.22f, 0.16f, Material.HURDLE_AMBER)
+            // Sturdy black steel A-frame base support legs on left & right
+            builder.addBox(-0.85f, 0.32f, 0f, 0.16f, 0.64f, 0.16f, Material.STREET_METAL_DARK)
+            builder.addBox(-0.85f, 0.05f, 0f, 0.18f, 0.10f, 0.45f, Material.STREET_METAL_DARK)
+
+            builder.addBox(0.85f, 0.32f, 0f, 0.16f, 0.64f, 0.16f, Material.STREET_METAL_DARK)
+            builder.addBox(0.85f, 0.05f, 0f, 0.18f, 0.10f, 0.45f, Material.STREET_METAL_DARK)
+
+            // Main horizontal barricade panel (width 1.8m, height 0.40m, center Y = 0.42m)
+            builder.addBox(0f, 0.42f, 0f, 1.8f, 0.40f, 0.12f, Material.BARRIER_ORANGE)
+
+            // Reflective white diagonal warning stripe blocks
+            val stripeX = floatArrayOf(-0.60f, -0.20f, 0.20f, 0.60f)
+            for (sx in stripeX) {
+                builder.addBox(sx, 0.42f, 0.065f, 0.20f, 0.36f, 0.02f, Material.BARRIER_WHITE)
+                builder.addBox(sx, 0.42f, -0.065f, 0.20f, 0.36f, 0.02f, Material.BARRIER_WHITE)
+            }
+
+            // Top flashing amber construction hazard beacon
+            builder.addBox(0f, 0.70f, 0f, 0.18f, 0.16f, 0.18f, Material.BARRIER_WARNING_LIGHT)
+            builder.addBox(0f, 0.62f, 0f, 0.22f, 0.06f, 0.22f, Material.STREET_METAL_DARK)
             return builder.build()
         }
 
         /**
-         * Obstacle 2: High Laser Gate (Requires SLIDE)
-         * Frame height = 2.4m, lower laser beam Y = 1.05m.
-         * Normal runner (height 1.8m) hits beam, sliding runner (height 0.75m) clears under it!
+         * Obstacle 2: Overhead Highway Clearance Girder & Traffic Sign (Requires SLIDE)
+         * Frame height = 2.7m, clearance bar Y = 1.05m to 1.65m.
+         * Normal runner (height 1.8m) hits clearance bar, sliding runner (height 0.75m) clears under it!
          */
         fun createHighLaserGate(): Mesh {
             val builder = MeshBuilder()
-            // Tall side pylons
-            builder.addBox(-0.95f, 1.3f, 0f, 0.22f, 2.6f, 0.22f, Material.BUILDING_DARK)
-            builder.addBox(0.95f, 1.3f, 0f, 0.22f, 2.6f, 0.22f, Material.BUILDING_DARK)
-            // Top structural beam
-            builder.addBox(0f, 2.5f, 0f, 2.0f, 0.25f, 0.22f, Material.BUILDING_DARK)
-            // Cyan laser beam suspended between Y = 1.0m and 1.8m
-            builder.addBox(0f, 1.45f, 0f, 1.8f, 0.7f, 0.12f, Material.LASER_CYAN)
+            // Heavy galvanized steel vertical I-beam support pylons on road edges
+            builder.addBox(-0.95f, 1.35f, 0f, 0.22f, 2.7f, 0.24f, Material.STREET_METAL_DARK)
+            builder.addBox(0.95f, 1.35f, 0f, 0.22f, 2.7f, 0.24f, Material.STREET_METAL_DARK)
+
+            // Heavy structural steel overhead cross girder at top
+            builder.addBox(0f, 2.65f, 0f, 2.12f, 0.30f, 0.28f, Material.STREET_METAL_DARK)
+
+            // Hanging green highway clearance lane sign
+            builder.addBox(0f, 2.2f, 0.14f, 1.7f, 0.55f, 0.06f, Material.HIGHWAY_SIGN_GREEN)
+            builder.addBox(0f, 2.2f, 0.17f, 1.55f, 0.08f, 0.02f, Material.ROAD_MARKING_WHITE)
+
+            // Low-hanging yellow/black hazard clearance bar (Y = 1.05m to 1.65m)
+            builder.addBox(0f, 1.35f, 0f, 1.85f, 0.55f, 0.14f, Material.BARRIER_WARNING_LIGHT)
+            val stripeX = floatArrayOf(-0.65f, -0.22f, 0.22f, 0.65f)
+            for (sx in stripeX) {
+                builder.addBox(sx, 1.35f, 0.075f, 0.20f, 0.50f, 0.02f, Material.STREET_METAL_DARK)
+                builder.addBox(sx, 1.35f, -0.075f, 0.20f, 0.50f, 0.02f, Material.STREET_METAL_DARK)
+            }
             return builder.build()
         }
 
         /**
-         * Obstacle 3: Cyber Security Block (Requires LANE SWITCH)
-         * Solid red hazard pillar blocking the entire lane (height 2.5m, width 1.8m).
+         * Obstacle 3: Concrete Jersey Road Barrier & Municipal Dumpster (Requires LANE SWITCH)
+         * Solid roadblock blocking entire lane (height 2.4m, width 1.8m).
          * Cannot be jumped or slid under.
          */
         fun createCyberBlock(): Mesh {
             val builder = MeshBuilder()
-            // Solid barricade
-            builder.addBox(0f, 1.25f, 0f, 1.75f, 2.5f, 0.8f, Material.BLOCK_RED)
-            // Accent lights
-            builder.addBox(0f, 2.2f, 0.42f, 1.5f, 0.15f, 0.08f, Material.BUILDING_WINDOW_GLOW)
-            builder.addBox(0f, 0.3f, 0.42f, 1.5f, 0.15f, 0.08f, Material.ROAD_CURB_MAGENTA)
+            // Bottom heavy concrete Jersey safety barrier base
+            builder.addBox(0f, 0.42f, 0f, 1.8f, 0.84f, 0.90f, Material.BUILDING_CONCRETE_GREY)
+            builder.addBox(0f, 0.88f, 0f, 1.7f, 0.12f, 0.65f, Material.SIDEWALK_CURB)
+
+            // High-visibility orange & white reflective chevron band across jersey barrier
+            builder.addBox(0f, 0.45f, 0.46f, 1.65f, 0.24f, 0.04f, Material.BARRIER_ORANGE)
+            builder.addBox(-0.45f, 0.45f, 0.485f, 0.25f, 0.24f, 0.02f, Material.BARRIER_WHITE)
+            builder.addBox(0.45f, 0.45f, 0.485f, 0.25f, 0.24f, 0.02f, Material.BARRIER_WHITE)
+
+            // Upper heavy industrial dark green steel roadblock dumpster (full height 2.4m)
+            builder.addBox(0f, 1.65f, 0f, 1.75f, 1.45f, 0.85f, Material.DUMPSTER_GREEN)
+            builder.addBox(0f, 2.42f, 0f, 1.78f, 0.12f, 0.88f, Material.STREET_METAL_DARK)
+            builder.addBox(-0.85f, 1.4f, 0f, 0.12f, 0.22f, 0.80f, Material.STREET_METAL_DARK)
+            builder.addBox(0.85f, 1.4f, 0f, 0.12f, 0.22f, 0.80f, Material.STREET_METAL_DARK)
+
             return builder.build()
         }
 
@@ -243,75 +388,72 @@ class MeshBuilder {
         }
 
         /**
-         * Neon Speed Tunnel: Overhead neon arch ribs repeated through the segment
+         * Highway Underpass / Concrete Arch Tunnel: Overhead concrete bridge arches with underpass lights
          */
         fun createTunnelRibMesh(): Mesh {
             val builder = MeshBuilder()
             val archZOffsets = floatArrayOf(-4.0f, -12.0f, -20.0f, -28.0f)
-            val archWidth = 9.2f
+            val archWidth = 9.4f
             val archHeight = 5.2f
-            val colThick = 0.35f
+            val colThick = 0.55f
 
             for (z in archZOffsets) {
-                // Left Column
-                builder.addBox(-archWidth * 0.5f, archHeight * 0.5f, z, colThick, archHeight, colThick, Material.TUNNEL_FRAME)
-                // Left Neon Edge
-                builder.addBox(-archWidth * 0.5f + colThick * 0.5f, archHeight * 0.5f, z, 0.08f, archHeight, 0.08f, Material.TUNNEL_NEON_MAGENTA)
-
-                // Right Column
-                builder.addBox(archWidth * 0.5f, archHeight * 0.5f, z, colThick, archHeight, colThick, Material.TUNNEL_FRAME)
-                // Right Neon Edge
-                builder.addBox(archWidth * 0.5f - colThick * 0.5f, archHeight * 0.5f, z, 0.08f, archHeight, 0.08f, Material.TUNNEL_NEON_MAGENTA)
-
-                // Top Crossbar Arch
-                builder.addBox(0f, archHeight, z, archWidth, colThick, colThick, Material.TUNNEL_FRAME)
-                // Top Neon Underlight
-                builder.addBox(0f, archHeight - colThick * 0.5f, z, archWidth - colThick * 2f, 0.08f, 0.08f, Material.ROAD_LANE_CYAN)
+                builder.addBox(-archWidth * 0.5f, archHeight * 0.5f, z, colThick, archHeight, colThick, Material.BUILDING_CONCRETE_GREY)
+                builder.addBox(archWidth * 0.5f, archHeight * 0.5f, z, colThick, archHeight, colThick, Material.BUILDING_CONCRETE_GREY)
+                builder.addBox(0f, archHeight, z, archWidth + colThick, colThick, colThick, Material.BUILDING_CONCRETE_GREY)
+                builder.addBox(-1.8f, archHeight - colThick * 0.55f, z, 0.9f, 0.10f, 0.22f, Material.STREET_LAMP_WARM)
+                builder.addBox(1.8f, archHeight - colThick * 0.55f, z, 0.9f, 0.10f, 0.22f, Material.STREET_LAMP_WARM)
             }
             return builder.build()
         }
 
         /**
-         * Sky Bridge: Heavy elevated bridge viaduct with support piers and glowing guardrails
+         * Highway Suspension Bridge & Viaduct: Elevated highway bridge with steel guardrails and piers
          */
         fun createBridgePylonMesh(): Mesh {
             val builder = MeshBuilder()
-            val railWidth = 0.25f
-            val railHeight = 1.2f
+            val railWidth = 0.28f
+            val railHeight = 1.15f
 
-            // Left & Right elevated safety guardrails with luminous top edge
-            builder.addBox(-4.6f, railHeight * 0.5f, -15.0f, railWidth, railHeight, 30.0f, Material.TUNNEL_FRAME)
-            builder.addBox(-4.6f, railHeight + 0.05f, -15.0f, 0.15f, 0.1f, 30.0f, Material.BRIDGE_GUARD_CYAN)
+            // Left & Right highway W-beam galvanized steel guardrails
+            builder.addBox(-4.6f, railHeight * 0.5f, -15.0f, railWidth, railHeight, 30.0f, Material.HIGHWAY_GUARDRAIL_STEEL)
+            builder.addBox(4.6f, railHeight * 0.5f, -15.0f, railWidth, railHeight, 30.0f, Material.HIGHWAY_GUARDRAIL_STEEL)
 
-            builder.addBox(4.6f, railHeight * 0.5f, -15.0f, railWidth, railHeight, 30.0f, Material.TUNNEL_FRAME)
-            builder.addBox(4.6f, railHeight + 0.05f, -15.0f, 0.15f, 0.1f, 30.0f, Material.BRIDGE_GUARD_CYAN)
+            // Massive concrete viaduct piers supporting the elevated highway deck
+            builder.addBox(-4.8f, -6.0f, -8.0f, 1.4f, 12.0f, 1.4f, Material.BUILDING_CONCRETE_GREY)
+            builder.addBox(4.8f, -6.0f, -8.0f, 1.4f, 12.0f, 1.4f, Material.BUILDING_CONCRETE_GREY)
+            builder.addBox(-4.8f, -6.0f, -22.0f, 1.4f, 12.0f, 1.4f, Material.BUILDING_CONCRETE_GREY)
+            builder.addBox(4.8f, -6.0f, -22.0f, 1.4f, 12.0f, 1.4f, Material.BUILDING_CONCRETE_GREY)
 
-            // Massive concrete viaduct piers descending into the depths
-            builder.addBox(-4.8f, -6.0f, -8.0f, 1.4f, 12.0f, 1.4f, Material.BUILDING_DARK)
-            builder.addBox(4.8f, -6.0f, -8.0f, 1.4f, 12.0f, 1.4f, Material.BUILDING_DARK)
-            builder.addBox(-4.8f, -6.0f, -22.0f, 1.4f, 12.0f, 1.4f, Material.BUILDING_DARK)
-            builder.addBox(4.8f, -6.0f, -22.0f, 1.4f, 12.0f, 1.4f, Material.BUILDING_DARK)
+            // Bridge highway lamppost towers
+            builder.addBox(-4.7f, 3.2f, -15.0f, 0.16f, 5.0f, 0.16f, Material.STREET_METAL_DARK)
+            builder.addBox(-4.4f, 5.6f, -15.0f, 0.6f, 0.18f, 0.25f, Material.STREET_LAMP_WARM)
+
+            builder.addBox(4.7f, 3.2f, -15.0f, 0.16f, 5.0f, 0.16f, Material.STREET_METAL_DARK)
+            builder.addBox(4.4f, 5.6f, -15.0f, 0.6f, 0.18f, 0.25f, Material.STREET_LAMP_WARM)
 
             return builder.build()
         }
 
         /**
-         * Overpass Gantry: Overhead highway portal gantry with glowing holographic signboard
+         * Interstate Overhead Green Highway Sign Gantry
          */
         fun createOverpassGantryMesh(): Mesh {
             val builder = MeshBuilder()
             val gantryZ = -15.0f
 
-            // Massive portal legs
-            builder.addBox(-4.8f, 3.2f, gantryZ, 0.6f, 6.4f, 0.6f, Material.GANTRY_STRUCTURE)
-            builder.addBox(4.8f, 3.2f, gantryZ, 0.6f, 6.4f, 0.6f, Material.GANTRY_STRUCTURE)
+            builder.addBox(-4.8f, 3.4f, gantryZ, 0.55f, 6.8f, 0.55f, Material.STREET_METAL_DARK)
+            builder.addBox(4.8f, 3.4f, gantryZ, 0.55f, 6.8f, 0.55f, Material.STREET_METAL_DARK)
 
-            // Overhead Truss
-            builder.addBox(0f, 6.2f, gantryZ, 10.2f, 0.8f, 0.6f, Material.GANTRY_STRUCTURE)
+            builder.addBox(0f, 6.4f, gantryZ, 10.4f, 0.75f, 0.55f, Material.STREET_METAL_DARK)
 
-            // Suspended Holographic Billboard Display (African-Cyberpunk Transit Notice)
-            builder.addBox(0f, 5.0f, gantryZ, 6.8f, 1.4f, 0.1f, Material.BILLBOARD_DISPLAY)
-            builder.addBox(0f, 5.0f, gantryZ - 0.08f, 7.0f, 1.6f, 0.05f, Material.TUNNEL_FRAME)
+            builder.addBox(-1.8f, 5.1f, gantryZ, 3.4f, 1.7f, 0.12f, Material.HIGHWAY_SIGN_GREEN)
+            builder.addBox(-1.8f, 5.1f, gantryZ - 0.08f, 3.2f, 0.10f, 0.02f, Material.ROAD_MARKING_WHITE)
+            builder.addBox(1.8f, 5.1f, gantryZ, 3.4f, 1.7f, 0.12f, Material.HIGHWAY_SIGN_GREEN)
+            builder.addBox(1.8f, 5.1f, gantryZ - 0.08f, 3.2f, 0.10f, 0.02f, Material.ROAD_MARKING_WHITE)
+
+            builder.addBox(-1.8f, 6.0f, gantryZ - 0.4f, 0.45f, 0.12f, 0.35f, Material.STREET_LAMP_WARM)
+            builder.addBox(1.8f, 6.0f, gantryZ - 0.4f, 0.45f, 0.12f, 0.35f, Material.STREET_LAMP_WARM)
 
             return builder.build()
         }
@@ -341,57 +483,45 @@ class MeshBuilder {
          */
         fun createPatrolDroneMesh(): Mesh {
             val builder = MeshBuilder()
-            // Main drone fuselage
             builder.addBox(0f, 0f, 0f, 0.75f, 0.35f, 0.65f, Material.DRONE_BODY)
-            // Left turbine pod
-            builder.addBox(-0.55f, 0.05f, 0f, 0.32f, 0.28f, 0.55f, Material.TUNNEL_FRAME)
-            builder.addBox(-0.55f, 0.05f, 0.28f, 0.22f, 0.2f, 0.05f, Material.ROAD_LANE_CYAN)
-            // Right turbine pod
-            builder.addBox(0.55f, 0.05f, 0f, 0.32f, 0.28f, 0.55f, Material.TUNNEL_FRAME)
-            builder.addBox(0.55f, 0.05f, 0.28f, 0.22f, 0.2f, 0.05f, Material.ROAD_LANE_CYAN)
-            // Front red scanning optical visor
+            builder.addBox(-0.55f, 0.05f, 0f, 0.32f, 0.28f, 0.55f, Material.STREET_METAL_DARK)
+            builder.addBox(-0.55f, 0.05f, 0.28f, 0.22f, 0.2f, 0.05f, Material.ROAD_MARKING_WHITE)
+            builder.addBox(0.55f, 0.05f, 0.28f, 0.22f, 0.2f, 0.05f, Material.ROAD_MARKING_WHITE)
             builder.addBox(0f, -0.05f, 0.34f, 0.45f, 0.14f, 0.08f, Material.DRONE_SCANNER_RED)
             return builder.build()
         }
 
         /**
-         * Sliding Hazard Gate: Heavy industrial motorized barrier moving horizontally across lanes
+         * Sliding Hazard Gate: Motorized heavy industrial construction barrier moving horizontally across lanes
          */
         fun createSlidingGateMesh(): Mesh {
             val builder = MeshBuilder()
-            // Main barrier panel
-            builder.addBox(0f, 0.9f, 0f, 1.8f, 1.8f, 0.45f, Material.TUNNEL_FRAME)
-            // Yellow caution chevrons
-            builder.addBox(0f, 1.4f, 0.24f, 1.6f, 0.22f, 0.04f, Material.GATE_HAZARD_STRIPE)
-            builder.addBox(0f, 0.4f, 0.24f, 1.6f, 0.22f, 0.04f, Material.GATE_HAZARD_STRIPE)
-            // Flashing amber beacon on top
-            builder.addBox(0f, 1.95f, 0f, 0.25f, 0.25f, 0.25f, Material.HURDLE_AMBER)
+            builder.addBox(0f, 0.95f, 0f, 1.8f, 1.9f, 0.24f, Material.STREET_METAL_DARK)
+            builder.addBox(0f, 1.45f, 0f, 1.65f, 0.35f, 0.28f, Material.BARRIER_WARNING_LIGHT)
+            builder.addBox(0f, 0.55f, 0f, 1.65f, 0.35f, 0.28f, Material.BARRIER_WARNING_LIGHT)
+            builder.addBox(0f, 2.0f, 0f, 0.22f, 0.22f, 0.22f, Material.BARRIER_WARNING_LIGHT)
             return builder.build()
         }
 
         /**
-         * Holographic Energy Storage Crate: Jumpable or breakable hazard
+         * Wooden Shipping Crate: Jumpable or breakable obstacle
          */
         fun createBreakableCrateMesh(): Mesh {
             val builder = MeshBuilder()
-            // Main crate body
-            builder.addBox(0f, 0.55f, 0f, 1.35f, 1.1f, 1.1f, Material.TUNNEL_FRAME)
-            // Luminous energy containment straps
-            builder.addBox(0f, 0.55f, 0.56f, 1.1f, 0.16f, 0.04f, Material.CRATE_ENERGY)
-            builder.addBox(0f, 0.55f, -0.56f, 1.1f, 0.16f, 0.04f, Material.CRATE_ENERGY)
-            builder.addBox(0f, 1.12f, 0f, 1.1f, 0.04f, 0.85f, Material.CRATE_ENERGY)
+            builder.addBox(0f, 0.55f, 0f, 1.35f, 1.1f, 1.1f, Material.STREET_TREE_TRUNK)
+            builder.addBox(0f, 0.55f, 0.56f, 1.1f, 0.16f, 0.04f, Material.STREET_METAL_DARK)
+            builder.addBox(0f, 0.55f, -0.56f, 1.1f, 0.16f, 0.04f, Material.STREET_METAL_DARK)
+            builder.addBox(0f, 1.12f, 0f, 1.1f, 0.04f, 0.85f, Material.STREET_METAL_DARK)
             return builder.build()
         }
 
         /**
-         * Falling Debris / Girder: Structural I-beam telegraphed to fall as player approaches
+         * Construction Girder Debris: Heavy structural steel I-beam with caution markings
          */
         fun createFallingDebrisMesh(): Mesh {
             val builder = MeshBuilder()
-            // Heavy metallic structural girder
-            builder.addBox(0f, 0.25f, 0f, 1.8f, 0.5f, 0.5f, Material.BUILDING_DARK)
-            // Hazard striping
-            builder.addBox(0f, 0.48f, 0f, 1.6f, 0.05f, 0.4f, Material.GATE_HAZARD_STRIPE)
+            builder.addBox(0f, 0.25f, 0f, 1.8f, 0.5f, 0.5f, Material.STREET_METAL_DARK)
+            builder.addBox(0f, 0.48f, 0f, 1.6f, 0.05f, 0.4f, Material.BARRIER_WARNING_LIGHT)
             return builder.build()
         }
 
@@ -436,8 +566,8 @@ class MeshBuilder {
             val builder = MeshBuilder()
             val slices = 6
             val sliceLength = length / slices
-            val curbWidth = 0.45f
-            val curbHeight = 0.40f
+            val curbWidth = 0.40f
+            val curbHeight = 0.35f
 
             for (i in 0 until slices) {
                 val zNear = -(i * sliceLength)
@@ -446,7 +576,6 @@ class MeshBuilder {
 
                 val tCenter = (i + 0.5f) / slices
                 val yCenter = startY + tCenter * (endY - startY)
-                val heightDiff = endY - startY
                 val rampThickness = 0.35f
 
                 // Main sloping asphalt road deck
@@ -456,16 +585,16 @@ class MeshBuilder {
                 val underY = (yCenter - 0.1f - rampThickness * 0.5f) * 0.5f
                 val underHeight = (yCenter - 0.1f - rampThickness * 0.5f)
                 if (underHeight > 0.1f) {
-                    builder.addBox(0f, underY, zCenter, width - 0.2f, underHeight, sliceLength, Material.BUILDING_DARK)
+                    builder.addBox(0f, underY, zCenter, width - 0.2f, underHeight, sliceLength, Material.BUILDING_CONCRETE_GREY)
                 }
 
-                // Neon lane markings
-                builder.addBox(-1.1f, yCenter + 0.08f, zCenter, 0.14f, 0.04f, sliceLength * 0.6f, Material.ROAD_LANE_CYAN)
-                builder.addBox(1.1f, yCenter + 0.08f, zCenter, 0.14f, 0.04f, sliceLength * 0.6f, Material.ROAD_LANE_CYAN)
+                // White painted lane divider markings
+                builder.addBox(-1.1f, yCenter + 0.08f, zCenter, 0.14f, 0.04f, sliceLength * 0.6f, Material.ROAD_MARKING_WHITE)
+                builder.addBox(1.1f, yCenter + 0.08f, zCenter, 0.14f, 0.04f, sliceLength * 0.6f, Material.ROAD_MARKING_WHITE)
 
-                // Outer curbs
-                builder.addBox(-width * 0.5f - curbWidth * 0.5f, yCenter + curbHeight * 0.5f, zCenter, curbWidth, curbHeight, sliceLength, Material.ROAD_CURB_MAGENTA)
-                builder.addBox(width * 0.5f + curbWidth * 0.5f, yCenter + curbHeight * 0.5f, zCenter, curbWidth, curbHeight, sliceLength, Material.ROAD_CURB_MAGENTA)
+                // Concrete outer curbs
+                builder.addBox(-width * 0.5f - curbWidth * 0.5f, yCenter + curbHeight * 0.5f, zCenter, curbWidth, curbHeight, sliceLength, Material.SIDEWALK_CURB)
+                builder.addBox(width * 0.5f + curbWidth * 0.5f, yCenter + curbHeight * 0.5f, zCenter, curbWidth, curbHeight, sliceLength, Material.SIDEWALK_CURB)
             }
 
             return builder.build()
@@ -480,33 +609,33 @@ class MeshBuilder {
             // Main elevated deck
             builder.addBox(0f, elevationY - 0.15f, -length * 0.5f, width, 0.35f, length, Material.ROAD_ASPHALT)
 
-            // Neon lane divider markings
+            // White lane divider markings
             val dashLength = 4.0f
             val gapLength = 3.0f
             var curZ = 0.0f
             while (curZ > -length) {
                 val zCenter = curZ - dashLength * 0.5f
-                builder.addBox(-1.1f, elevationY + 0.04f, zCenter, 0.14f, 0.04f, dashLength, Material.ROAD_LANE_CYAN)
-                builder.addBox(1.1f, elevationY + 0.04f, zCenter, 0.14f, 0.04f, dashLength, Material.ROAD_LANE_CYAN)
+                builder.addBox(-1.1f, elevationY + 0.04f, zCenter, 0.14f, 0.04f, dashLength, Material.ROAD_MARKING_WHITE)
+                builder.addBox(1.1f, elevationY + 0.04f, zCenter, 0.14f, 0.04f, dashLength, Material.ROAD_MARKING_WHITE)
                 curZ -= (dashLength + gapLength)
             }
 
-            // Outer elevated glowing curbs & high safety guardrails
-            val curbWidth = 0.45f
-            val railHeight = 1.2f
-            builder.addBox(-width * 0.5f - curbWidth * 0.5f, elevationY + railHeight * 0.5f, -length * 0.5f, curbWidth, railHeight, length, Material.TUNNEL_FRAME)
-            builder.addBox(-width * 0.5f - curbWidth * 0.5f, elevationY + railHeight + 0.05f, -length * 0.5f, 0.15f, 0.1f, length, Material.BRIDGE_GUARD_CYAN)
+            // Outer concrete highway barriers & galvanized steel safety guardrails
+            val curbWidth = 0.40f
+            val railHeight = 1.15f
+            builder.addBox(-width * 0.5f - curbWidth * 0.5f, elevationY + railHeight * 0.5f, -length * 0.5f, curbWidth, railHeight, length, Material.SIDEWALK_CURB)
+            builder.addBox(-width * 0.5f - curbWidth * 0.5f, elevationY + railHeight + 0.05f, -length * 0.5f, 0.15f, 0.1f, length, Material.HIGHWAY_GUARDRAIL_STEEL)
 
-            builder.addBox(width * 0.5f + curbWidth * 0.5f, elevationY + railHeight * 0.5f, -length * 0.5f, curbWidth, railHeight, length, Material.TUNNEL_FRAME)
-            builder.addBox(width * 0.5f + curbWidth * 0.5f, elevationY + railHeight + 0.05f, -length * 0.5f, 0.15f, 0.1f, length, Material.BRIDGE_GUARD_CYAN)
+            builder.addBox(width * 0.5f + curbWidth * 0.5f, elevationY + railHeight * 0.5f, -length * 0.5f, curbWidth, railHeight, length, Material.SIDEWALK_CURB)
+            builder.addBox(width * 0.5f + curbWidth * 0.5f, elevationY + railHeight + 0.05f, -length * 0.5f, 0.15f, 0.1f, length, Material.HIGHWAY_GUARDRAIL_STEEL)
 
             // Concrete foundation piers extending to the ground
             val pierHeight = elevationY + 4.0f
             val pierCenterY = (elevationY - pierHeight) * 0.5f
-            builder.addBox(-width * 0.4f, pierCenterY, -8.0f, 1.2f, pierHeight, 1.2f, Material.BUILDING_DARK)
-            builder.addBox(width * 0.4f, pierCenterY, -8.0f, 1.2f, pierHeight, 1.2f, Material.BUILDING_DARK)
-            builder.addBox(-width * 0.4f, pierCenterY, -22.0f, 1.2f, pierHeight, 1.2f, Material.BUILDING_DARK)
-            builder.addBox(width * 0.4f, pierCenterY, -22.0f, 1.2f, pierHeight, 1.2f, Material.BUILDING_DARK)
+            builder.addBox(-width * 0.4f, pierCenterY, -8.0f, 1.2f, pierHeight, 1.2f, Material.BUILDING_CONCRETE_GREY)
+            builder.addBox(width * 0.4f, pierCenterY, -8.0f, 1.2f, pierHeight, 1.2f, Material.BUILDING_CONCRETE_GREY)
+            builder.addBox(-width * 0.4f, pierCenterY, -22.0f, 1.2f, pierHeight, 1.2f, Material.BUILDING_CONCRETE_GREY)
+            builder.addBox(width * 0.4f, pierCenterY, -22.0f, 1.2f, pierHeight, 1.2f, Material.BUILDING_CONCRETE_GREY)
 
             return builder.build()
         }
@@ -758,67 +887,12 @@ class MeshBuilder {
         }
 
         // ==========================================
-        // BIOME 1: METRO TRANSIT & RAIL DEPOT MESHES
+        // BIOME 1: URBAN CITY STREETS & HIGHWAY MESHES
         // ==========================================
 
-        fun createSubwayRoadMesh(width: Float, length: Float): Mesh {
-            val builder = MeshBuilder()
-            // Dark gravel ballast track bed
-            builder.addBox(0f, -0.1f, -length * 0.5f, width, 0.2f, length, Material.SUBWAY_BALLAST)
+        fun createSubwayRoadMesh(width: Float, length: Float): Mesh = createCityStreetRoadMesh(width, length)
 
-            // Wooden railroad sleepers spaced along the track
-            var curZ = 0.0f
-            while (curZ > -length) {
-                builder.addBox(0f, 0.01f, curZ, width * 0.88f, 0.035f, 0.38f, Material.SUBWAY_SLEEPER_WOOD)
-                curZ -= 1.8f
-            }
-
-            // 3 pairs of steel rails (one pair per lane: -2.2m, 0.0m, +2.2m)
-            val laneCenters = floatArrayOf(-2.2f, 0.0f, 2.2f)
-            val railGaugeHalf = 0.42f
-            for (lx in laneCenters) {
-                builder.addBox(lx - railGaugeHalf, 0.05f, -length * 0.5f, 0.09f, 0.08f, length, Material.SUBWAY_RAIL_STEEL)
-                builder.addBox(lx + railGaugeHalf, 0.05f, -length * 0.5f, 0.09f, 0.08f, length, Material.SUBWAY_RAIL_STEEL)
-            }
-
-            // Industrial concrete cable troughs & glowing amber caution curbs
-            val curbWidth = 0.45f
-            val curbHeight = 0.35f
-            builder.addBox(-width * 0.5f - curbWidth * 0.5f, curbHeight * 0.5f, -length * 0.5f, curbWidth, curbHeight, length, Material.SUBWAY_PLATFORM_WALL)
-            builder.addBox(-width * 0.5f, curbHeight + 0.02f, -length * 0.5f, 0.12f, 0.04f, length, Material.SUBWAY_SIGNAL_AMBER)
-            builder.addBox(width * 0.5f + curbWidth * 0.5f, curbHeight * 0.5f, -length * 0.5f, curbWidth, curbHeight, length, Material.SUBWAY_PLATFORM_WALL)
-            builder.addBox(width * 0.5f, curbHeight + 0.02f, -length * 0.5f, 0.12f, 0.04f, length, Material.SUBWAY_SIGNAL_AMBER)
-
-            return builder.build()
-        }
-
-        fun createSubwaySceneryMesh(): Mesh {
-            val builder = MeshBuilder()
-
-            // LEFT SIDE: Elevated Metro Passenger Station Platform
-            builder.addBox(-8.0f, 1.2f, -15.0f, 4.2f, 2.4f, 30.0f, Material.SUBWAY_PLATFORM_WALL)
-            builder.addBox(-6.0f, 2.42f, -15.0f, 0.35f, 0.04f, 30.0f, Material.SUBWAY_SIGNAL_AMBER)
-            // Station canopy roof & pillars
-            builder.addBox(-8.0f, 6.2f, -15.0f, 4.6f, 0.4f, 30.0f, Material.BUILDING_DARK)
-            builder.addBox(-7.5f, 3.8f, -6.0f, 0.4f, 4.8f, 0.4f, Material.SUBWAY_PLATFORM_WALL)
-            builder.addBox(-7.5f, 3.8f, -22.0f, 0.4f, 4.8f, 0.4f, Material.SUBWAY_PLATFORM_WALL)
-
-            // RIGHT SIDE: Siding Track with Parked Futuristic Maglev Train Car
-            builder.addBox(8.2f, -0.05f, -15.0f, 3.8f, 0.15f, 30.0f, Material.SUBWAY_BALLAST)
-            // Maglev train chassis & sleek aerodynamic body
-            builder.addBox(8.2f, 1.6f, -15.0f, 2.6f, 2.8f, 22.0f, Material.SUBWAY_TRAIN_BODY)
-            builder.addBox(8.2f, 1.8f, -15.0f, 2.65f, 0.8f, 21.0f, Material.BUILDING_DARK) // Dark panoramic windows
-            builder.addBox(6.85f, 0.6f, -15.0f, 0.08f, 0.18f, 22.0f, Material.SUBWAY_TRAIN_ACCENT) // Glowing red mag-lev speed stripe
-            builder.addBox(6.85f, 2.6f, -15.0f, 0.08f, 0.12f, 22.0f, Material.ROAD_LANE_CYAN)
-
-            // Overhead steel girder signal gantry with amber status cluster
-            builder.addBox(-5.2f, 3.5f, -14.0f, 0.45f, 7.0f, 0.45f, Material.GANTRY_STRUCTURE)
-            builder.addBox(5.2f, 3.5f, -14.0f, 0.45f, 7.0f, 0.45f, Material.GANTRY_STRUCTURE)
-            builder.addBox(0f, 6.8f, -14.0f, 10.8f, 0.5f, 0.45f, Material.GANTRY_STRUCTURE)
-            builder.addBox(0f, 6.4f, -13.8f, 1.8f, 0.35f, 0.15f, Material.SUBWAY_SIGNAL_AMBER)
-
-            return builder.build()
-        }
+        fun createSubwaySceneryMesh(): Mesh = createCityBuildingsSceneryMesh()
 
         // ==========================================
         // BIOME 2: RUSTFALL DESERT CANYON MESHES

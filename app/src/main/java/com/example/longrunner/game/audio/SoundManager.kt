@@ -32,7 +32,6 @@ class SoundManager(private val context: Context? = null) {
     private var shieldBreakSoundId = 0
     private var overdriveSoundId = 0
     private var timeBrakeSoundId = 0
-    private var blackoutSoundId = 0
     private var droneAlarmSoundId = 0
     private var realityGlitchSoundId = 0
     private var nullHeartbeatSoundId = 0
@@ -249,15 +248,6 @@ class SoundManager(private val context: Context? = null) {
             }
             timeBrakeSoundId = soundPool.load(timeBrakeFile.absolutePath, 1)
 
-            // 20. City Blackout Warning: Power grid failure brownout drone (320Hz -> 50Hz, 0.45s)
-            val blackoutFile = File(cacheDir, "sfx_blackout.wav")
-            generateWav(blackoutFile, 0.45f) { t ->
-                val freq = 320.0 - 270.0 * (t / 0.45)
-                val hum = sin(2.0 * PI * 60.0 * t).toFloat() * 0.35f
-                val env = (1.0f - (t / 0.45f))
-                (sin(2.0 * PI * freq * t).toFloat() * 0.65f + hum) * env
-            }
-            blackoutSoundId = soundPool.load(blackoutFile.absolutePath, 1)
 
             // 21. Drone Swarm Alert: Radar scanner alarm chirp (1100Hz <-> 1600Hz alternating, 0.25s)
             val droneAlarmFile = File(cacheDir, "sfx_drone_alarm.wav")
@@ -410,7 +400,6 @@ class SoundManager(private val context: Context? = null) {
     fun playShieldBreak() = play(shieldBreakSoundId, 1.0f, 8)
     fun playOverdrive() = play(overdriveSoundId, 1.0f, 9)
     fun playTimeBrake() = play(timeBrakeSoundId, 1.0f, 9)
-    fun playBlackoutWarning() = play(blackoutSoundId, 1.0f, 8)
     fun playDroneAlarm() = play(droneAlarmSoundId, 0.9f, 8)
     fun playRealityGlitch() = play(realityGlitchSoundId, 0.85f, 7)
     fun playNullHeartbeat() = play(nullHeartbeatSoundId, 1.0f, 10)

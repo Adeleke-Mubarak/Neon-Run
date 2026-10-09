@@ -3,10 +3,15 @@ package com.example.longrunner.game.world.biomes
 import com.example.longrunner.game.core.GameConstants
 
 enum class BiomeType {
-    SUBWAY_DEPOT,
+    CITY_STREETS,
     DESERT_CANYON,
     OVERGROWN_RUINS,
-    ORBITAL_SKYDECK
+    ORBITAL_SKYDECK;
+
+    companion object {
+        @JvmField
+        val SUBWAY_DEPOT = CITY_STREETS
+    }
 }
 
 /**
@@ -67,33 +72,36 @@ data class BiomeData(
     val atmosphere: BiomeAtmosphere
 ) {
     companion object {
-        val SUBWAY_DEPOT = BiomeData(
-            type = BiomeType.SUBWAY_DEPOT,
+        val CITY_STREETS = BiomeData(
+            type = BiomeType.CITY_STREETS,
             zoneNumber = 1,
-            name = "METRO TRANSIT",
-            subtitle = "MAG-LEV RAIL DEPOT",
+            name = "URBAN CITY STREETS",
+            subtitle = "DOWNTOWN AVENUE & HIGHWAY",
             minDistance = 0f,
             maxDistance = 900f,
-            accentColorHex = 0xFF00F0FF, // Cyan & steel blue
+            accentColorHex = 0xFFFF9900, // Safety Amber & Daylight Gold
             atmosphere = BiomeAtmosphere(
-                clearR = 0.03f,
-                clearG = 0.04f,
-                clearB = 0.08f,
-                fogR = 0.04f,
-                fogG = 0.06f,
-                fogB = 0.10f,
-                fogDensity = GameConstants.FOG_DENSITY * 1.0f,
-                lightDirX = 0.35f,
-                lightDirY = 0.90f,
-                lightDirZ = -0.40f,
-                lightColorR = 0.95f,
-                lightColorG = 0.92f,
-                lightColorB = 1.0f,
-                ambientR = 0.38f,
-                ambientG = 0.40f,
-                ambientB = 0.52f
+                clearR = 0.48f,
+                clearG = 0.68f,
+                clearB = 0.90f, // Crisp daytime blue sky
+                fogR = 0.58f,
+                fogG = 0.72f,
+                fogB = 0.88f,   // Soft atmospheric daytime haze
+                fogDensity = GameConstants.FOG_DENSITY * 0.70f,
+                lightDirX = 0.45f,
+                lightDirY = 0.85f,
+                lightDirZ = -0.35f, // Angled bright midday sun
+                lightColorR = 1.0f,
+                lightColorG = 0.98f,
+                lightColorB = 0.92f, // Warm sunlight
+                ambientR = 0.45f,
+                ambientG = 0.48f,
+                ambientB = 0.52f     // Blue ambient fill from sky
             )
         )
+
+        @JvmField
+        val SUBWAY_DEPOT = CITY_STREETS
 
         val DESERT_CANYON = BiomeData(
             type = BiomeType.DESERT_CANYON,
@@ -179,7 +187,7 @@ data class BiomeData(
             )
         )
 
-        val ALL = listOf(SUBWAY_DEPOT, DESERT_CANYON, OVERGROWN_RUINS, ORBITAL_SKYDECK)
+        val ALL = listOf(CITY_STREETS, DESERT_CANYON, OVERGROWN_RUINS, ORBITAL_SKYDECK)
 
         fun getByDistance(distance: Float): BiomeData {
             val d = distance.coerceAtLeast(0f)
