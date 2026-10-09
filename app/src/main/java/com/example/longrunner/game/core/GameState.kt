@@ -80,5 +80,10 @@ data class GameStats(
     val achievementBannerMessage: String = "",
     val unclaimedMissionsCount: Int = 0,
     val fps: Int = 60,
-    val frameTimeMs: Float = 16.6f
+    val frameTimeMs: Float = 16.6f,
+    val currentBiomeName: String = "METRO TRANSIT",
+    val currentBiomeZone: Int = 1,
+    val biomeBannerMessage: String = "",
+    val biomeBannerSubtitle: String = "",
+    val biomeAccentColorHex: Long = 0xFF00F0FF
 )

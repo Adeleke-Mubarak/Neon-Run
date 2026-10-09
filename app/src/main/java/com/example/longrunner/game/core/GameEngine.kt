@@ -32,7 +32,8 @@ class GameEngine(val context: Context? = null) {
 
     val characterManager = CharacterManager(context)
     val player = PlayerController(characterManager.getActiveCharacter())
-    val trackGenerator = TrackGenerator()
+    val biomeManager = com.example.longrunner.game.world.biomes.BiomeManager()
+    val trackGenerator = TrackGenerator(biomeManager = biomeManager)
     val collisionSystem = CollisionSystem()
     val scoreManager = ScoreManager(context)
     val soundManager = SoundManager(context)
@@ -242,6 +243,7 @@ class GameEngine(val context: Context? = null) {
         state = GameState.READY
         player.reset()
         trackGenerator.reset()
+        biomeManager.reset()
         scoreManager.reset()
         comboManager.reset()
         nearMissTracker.reset()
@@ -671,6 +673,9 @@ class GameEngine(val context: Context? = null) {
             extraMultiplier = (if (powerUpManager.isScoreAmplifierActive) 3 else 0) + progressionManager.permanentMultiplierBonus + boardScoreBonus
         )
 
+        // Update active dynamic biome environment and atmospheric transition
+        biomeManager.update(scoreManager.distance, effectiveDt)
+
         // Evaluate Void Dodger achievement (escaped critical back to safe)
         if (nullChaser.isCritical) {
             wasNullCriticalInRun = true
@@ -797,7 +802,12 @@ class GameEngine(val context: Context? = null) {
             achievementBannerMessage = achievementBannerMessage,
             unclaimedMissionsCount = missionManager.activeMissions.count { it.isCompleted && !it.isClaimed },
             fps = currentFps,
-            frameTimeMs = currentFrameTimeMs
+            frameTimeMs = currentFrameTimeMs,
+            currentBiomeName = biomeManager.currentBiomeName,
+            currentBiomeZone = biomeManager.getActiveBiome().zoneNumber,
+            biomeBannerMessage = biomeManager.biomeBannerMessage,
+            biomeBannerSubtitle = biomeManager.biomeBannerSubtitle,
+            biomeAccentColorHex = biomeManager.biomeAccentColorHex
         )
         onStatsUpdated?.invoke(stats)
     }

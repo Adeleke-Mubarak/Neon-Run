@@ -14,6 +14,8 @@ class PlayerController(var characterData: CharacterData = CharacterData.KAI) {
     var z: Float = 0f
         private set
 
+    val distanceTraveled: Float get() = kotlin.math.abs(z)
+
     var currentLane: Int = GameConstants.LANE_CENTER
         private set
     var targetLane: Int = GameConstants.LANE_CENTER
@@ -259,5 +261,12 @@ class PlayerController(var characterData: CharacterData = CharacterData.KAI) {
             val h = GameConstants.PLAYER_STAND_HEIGHT
             collider.set(x, y + h * 0.5f, sweptCenterZ, halfW, h * 0.5f, sweptHalfD)
         }
+    }
+
+    fun teleport(newX: Float = x, newY: Float = y, newZ: Float = z) {
+        x = newX
+        y = newY
+        z = newZ
+        updateCollider(0f)
     }
 }

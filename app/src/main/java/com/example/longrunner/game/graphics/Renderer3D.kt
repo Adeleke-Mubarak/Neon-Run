@@ -35,6 +35,17 @@ class Renderer3D(
     private var breakableCrateMesh: Mesh? = null
     private var fallingDebrisMesh: Mesh? = null
 
+    // Multi-Biome Shifting Environment Meshes
+    private var subwayRoadMesh: Mesh? = null
+    private var canyonRoadMesh: Mesh? = null
+    private var ruinsRoadMesh: Mesh? = null
+    private var orbitalRoadMesh: Mesh? = null
+    private var subwaySceneryMesh: Mesh? = null
+    private var canyonSceneryMesh: Mesh? = null
+    private var ruinsSceneryMesh: Mesh? = null
+    private var orbitalSceneryMesh: Mesh? = null
+    private var transitGatewayMesh: Mesh? = null
+
     private var shardMesh: Mesh? = null
     private var phaseCoreMesh: Mesh? = null
     private var creditMesh: Mesh? = null
@@ -80,6 +91,19 @@ class Renderer3D(
         rampUpRoadMesh = MeshBuilder.createRampRoadMesh(GameConstants.TRACK_WIDTH, GameConstants.SEGMENT_LENGTH, 0.0f, 3.5f)
         elevatedRoadMesh = MeshBuilder.createElevatedRoadMesh(GameConstants.TRACK_WIDTH, GameConstants.SEGMENT_LENGTH, 3.5f)
         rampDownRoadMesh = MeshBuilder.createRampRoadMesh(GameConstants.TRACK_WIDTH, GameConstants.SEGMENT_LENGTH, 3.5f, 0.0f)
+
+        // Multi-Biome Shifting Environment Road & Scenery Meshes
+        subwayRoadMesh = MeshBuilder.createSubwayRoadMesh(GameConstants.TRACK_WIDTH, GameConstants.SEGMENT_LENGTH)
+        canyonRoadMesh = MeshBuilder.createDesertCanyonRoadMesh(GameConstants.TRACK_WIDTH, GameConstants.SEGMENT_LENGTH)
+        ruinsRoadMesh = MeshBuilder.createRuinsViaductRoadMesh(GameConstants.TRACK_WIDTH, GameConstants.SEGMENT_LENGTH)
+        orbitalRoadMesh = MeshBuilder.createOrbitalSkydeckRoadMesh(GameConstants.TRACK_WIDTH, GameConstants.SEGMENT_LENGTH)
+
+        subwaySceneryMesh = MeshBuilder.createSubwaySceneryMesh()
+        canyonSceneryMesh = MeshBuilder.createDesertCanyonSceneryMesh()
+        ruinsSceneryMesh = MeshBuilder.createOvergrownRuinsSceneryMesh()
+        orbitalSceneryMesh = MeshBuilder.createOrbitalSkydeckSceneryMesh()
+        transitGatewayMesh = MeshBuilder.createTransitGatewayMesh()
+
         buildingMesh = MeshBuilder.createBuildingScenery()
         tunnelMesh = MeshBuilder.createTunnelRibMesh()
         bridgeMesh = MeshBuilder.createBridgePylonMesh()
@@ -162,11 +186,13 @@ class Renderer3D(
         camera.update(engine.player, dtSec)
 
         val phaseTransition = engine.phaseEnergyManager.phaseFrequencyTransition
+        val playerDistance = engine.scoreManager.distance
+        val atmosphere = engine.biomeManager.getInterpolatedAtmosphere(playerDistance)
 
-        // Clear screen with dynamic dual-reality palette
-        val clearR = 0.04f + 0.06f * phaseTransition
-        val clearG = 0.03f - 0.02f * phaseTransition
-        val clearB = 0.08f + 0.12f * phaseTransition
+        // Clear screen with dynamic dual-reality palette modulated by interpolated biome atmosphere
+        val clearR = (atmosphere.clearR + (0.10f - atmosphere.clearR) * phaseTransition).coerceIn(0f, 1f)
+        val clearG = (atmosphere.clearG * (1f - phaseTransition * 0.5f)).coerceIn(0f, 1f)
+        val clearB = (atmosphere.clearB + (0.20f - atmosphere.clearB) * phaseTransition).coerceIn(0f, 1f)
         GLES30.glClearColor(clearR, clearG, clearB, 1.0f)
         GLES30.glClear(GLES30.GL_COLOR_BUFFER_BIT or GLES30.GL_DEPTH_BUFFER_BIT)
 
@@ -175,6 +201,15 @@ class Renderer3D(
         val activeRampUp = rampUpRoadMesh ?: return
         val activeElevated = elevatedRoadMesh ?: return
         val activeRampDown = rampDownRoadMesh ?: return
+        val activeSubwayRoad = subwayRoadMesh ?: return
+        val activeCanyonRoad = canyonRoadMesh ?: return
+        val activeRuinsRoad = ruinsRoadMesh ?: return
+        val activeOrbitalRoad = orbitalRoadMesh ?: return
+        val activeSubwayScenery = subwaySceneryMesh ?: return
+        val activeCanyonScenery = canyonSceneryMesh ?: return
+        val activeRuinsScenery = ruinsSceneryMesh ?: return
+        val activeOrbitalScenery = orbitalSceneryMesh ?: return
+        val activeGateway = transitGatewayMesh ?: return
         val activeBuilding = buildingMesh ?: return
         val activeTunnel = tunnelMesh ?: return
         val activeBridge = bridgeMesh ?: return
@@ -205,22 +240,28 @@ class Renderer3D(
 
         activeShader.bind()
 
-        // Set global lighting and cyber fog with phase shift chromatic distortion
+        // Set global lighting and cyber fog with phase shift chromatic distortion & biome atmosphere
         activeShader.setPhaseFrequency(phaseTransition)
         activeShader.setBlackoutFactor(engine.worldEventManager.blackoutFactor)
         activeShader.setGlitchFactor(
             if (engine.settingsManager.isGlitchShaderEnabled) engine.worldEventManager.glitchFactor else 0f
         )
+        val lightR = (atmosphere.lightColorR + 0.15f * phaseTransition).coerceIn(0f, 1f)
+        val lightG = (atmosphere.lightColorG - 0.20f * phaseTransition).coerceIn(0f, 1f)
+        val lightB = (atmosphere.lightColorB + 0.20f * phaseTransition).coerceIn(0f, 1f)
+        val ambR = atmosphere.ambientR
+        val ambG = atmosphere.ambientG
+        val ambB = (atmosphere.ambientB + 0.15f * phaseTransition).coerceIn(0f, 1f)
         activeShader.setLighting(
-            0.35f, 0.9f, -0.4f,
-            0.95f + 0.15f * phaseTransition, 0.9f - 0.2f * phaseTransition, 1.0f + 0.2f * phaseTransition,
-            0.4f, 0.4f, 0.55f
+            atmosphere.lightDirX, atmosphere.lightDirY, atmosphere.lightDirZ,
+            lightR, lightG, lightB,
+            ambR, ambG, ambB
         )
         activeShader.setEmissive(0.2f * phaseTransition)
-        val fogR = 0.04f + 0.08f * phaseTransition
-        val fogG = 0.03f - 0.01f * phaseTransition
-        val fogB = 0.08f + 0.14f * phaseTransition
-        val scaledFogDensity = GameConstants.FOG_DENSITY * (1.0f + 0.35f * phaseTransition) * performanceProfile.fogDensityMultiplier
+        val fogR = (atmosphere.fogR + 0.08f * phaseTransition).coerceIn(0f, 1f)
+        val fogG = (atmosphere.fogG - 0.01f * phaseTransition).coerceIn(0f, 1f)
+        val fogB = (atmosphere.fogB + 0.14f * phaseTransition).coerceIn(0f, 1f)
+        val scaledFogDensity = atmosphere.fogDensity * (1.0f + 0.35f * phaseTransition) * performanceProfile.fogDensityMultiplier
         activeShader.setFog(fogR, fogG, fogB, scaledFogDensity)
         activeShader.setCameraPosition(camera.position.x, camera.position.y, camera.position.z)
 
@@ -234,19 +275,28 @@ class Renderer3D(
             activeRampUp,
             activeElevated,
             activeRampDown,
-            activeBuilding,
-            activeTunnel,
-            activeBridge,
-            activeGantry,
-            activeSolar,
-            activeFractureSplit,
-            activeHurdle,
-            activeLaser,
-            activeBlock,
-            activeDrone,
-            activeGate,
-            activeCrate,
-            activeDebris,
+            subwayRoadMesh = activeSubwayRoad,
+            canyonRoadMesh = activeCanyonRoad,
+            ruinsRoadMesh = activeRuinsRoad,
+            orbitalRoadMesh = activeOrbitalRoad,
+            subwaySceneryMesh = activeSubwayScenery,
+            canyonSceneryMesh = activeCanyonScenery,
+            ruinsSceneryMesh = activeRuinsScenery,
+            orbitalSceneryMesh = activeOrbitalScenery,
+            transitGatewayMesh = activeGateway,
+            buildingMesh = activeBuilding,
+            tunnelMesh = activeTunnel,
+            bridgeMesh = activeBridge,
+            gantryMesh = activeGantry,
+            solarCanopyMesh = activeSolar,
+            fractureSplitDecorMesh = activeFractureSplit,
+            lowHurdleMesh = activeHurdle,
+            highBeamMesh = activeLaser,
+            cyberBlockMesh = activeBlock,
+            patrolDroneMesh = activeDrone,
+            slidingGateMesh = activeGate,
+            breakableCrateMesh = activeCrate,
+            fallingDebrisMesh = activeDebris,
             shardMesh = activeShard,
             phaseCoreMesh = activePhaseCore,
             creditMesh = activeCredit,

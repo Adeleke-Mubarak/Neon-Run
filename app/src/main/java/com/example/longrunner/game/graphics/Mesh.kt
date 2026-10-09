@@ -56,6 +56,37 @@ data class Material(
         val POWERUP_HOVERBOARD_MAGENTA = Material(1.0f, 0.05f, 0.75f, 1f, 0.95f)
         val POWERUP_HOVERBOARD_DECK = Material(0.06f, 0.05f, 0.12f, 1f, 0.1f)
         val POWERUP_HOVERBOARD_THRUSTER = Material(0.0f, 1.0f, 0.85f, 1f, 0.98f)
+
+        // Biome 1: Metro Transit & Rail Depot
+        val SUBWAY_BALLAST = Material(0.12f, 0.12f, 0.16f, 1f, 0.0f)
+        val SUBWAY_RAIL_STEEL = Material(0.78f, 0.82f, 0.92f, 1f, 0.7f)
+        val SUBWAY_SLEEPER_WOOD = Material(0.22f, 0.16f, 0.12f, 1f, 0.05f)
+        val SUBWAY_PLATFORM_WALL = Material(0.18f, 0.20f, 0.24f, 1f, 0.0f)
+        val SUBWAY_SIGNAL_AMBER = Material(1.0f, 0.65f, 0.05f, 1f, 0.95f)
+        val SUBWAY_TRAIN_BODY = Material(0.15f, 0.28f, 0.45f, 1f, 0.15f)
+        val SUBWAY_TRAIN_ACCENT = Material(1.0f, 0.20f, 0.10f, 1f, 0.9f)
+
+        // Biome 2: Rustfall Desert Canyon
+        val CANYON_SANDSTONE_DARK = Material(0.55f, 0.28f, 0.14f, 1f, 0.0f)
+        val CANYON_SANDSTONE_LIGHT = Material(0.85f, 0.48f, 0.22f, 1f, 0.15f)
+        val CANYON_TRESTLE_WOOD = Material(0.32f, 0.18f, 0.10f, 1f, 0.0f)
+        val CANYON_CACTUS_GREEN = Material(0.16f, 0.48f, 0.18f, 1f, 0.2f)
+        val CANYON_RUST_PIPE = Material(0.50f, 0.22f, 0.12f, 1f, 0.1f)
+        val CANYON_SUNSET_AMBER = Material(1.0f, 0.50f, 0.15f, 1f, 0.95f)
+
+        // Biome 3: Bioluminescent Jungle Ruins
+        val RUINS_STONE_ANCIENT = Material(0.18f, 0.22f, 0.20f, 1f, 0.05f)
+        val RUINS_MOSS_GREEN = Material(0.08f, 0.58f, 0.25f, 1f, 0.4f)
+        val RUINS_TREE_BARK = Material(0.24f, 0.16f, 0.12f, 1f, 0.0f)
+        val RUINS_GLOW_FLORA = Material(0.20f, 1.0f, 0.65f, 1f, 0.95f)
+        val RUINS_VIOLET_SPORE = Material(0.78f, 0.18f, 1.0f, 1f, 0.95f)
+
+        // Biome 4: Orbital Skydeck
+        val ORBITAL_GLASS_FLOOR = Material(0.08f, 0.16f, 0.30f, 0.88f, 0.45f)
+        val ORBITAL_GOLD_TRIM = Material(1.0f, 0.84f, 0.12f, 1f, 0.95f)
+        val ORBITAL_SOLAR_BLUE = Material(0.06f, 0.38f, 0.90f, 1f, 0.90f)
+        val ORBITAL_WHITE_CHASSIS = Material(0.92f, 0.94f, 0.98f, 1f, 0.35f)
+        val ORBITAL_HOLOGRAM_CYAN = Material(0.0f, 0.95f, 1.0f, 1f, 0.95f)
     }
 }
 

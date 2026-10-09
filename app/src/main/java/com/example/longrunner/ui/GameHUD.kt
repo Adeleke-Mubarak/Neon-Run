@@ -166,6 +166,50 @@ fun GameHUD(
                     }
                 }
 
+                // Dynamic Multi-Biome Zone Announcement Toast
+                AnimatedVisibility(
+                    visible = stats.biomeBannerMessage.isNotEmpty(),
+                    enter = fadeIn(),
+                    exit = fadeOut(),
+                    modifier = Modifier.align(Alignment.CenterHorizontally).padding(top = 8.dp)
+                ) {
+                    val accentColor = Color(stats.biomeAccentColorHex)
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier
+                            .background(
+                                Brush.verticalGradient(
+                                    listOf(
+                                        Color(0xEE121824),
+                                        Color(0xF0080B12)
+                                    )
+                                ),
+                                shape = RoundedCornerShape(12.dp)
+                            )
+                            .border(2.dp, accentColor, RoundedCornerShape(12.dp))
+                            .padding(horizontal = 20.dp, vertical = 8.dp)
+                    ) {
+                        Text(
+                            text = "🌍 " + stats.biomeBannerMessage,
+                            color = accentColor,
+                            fontSize = 13.sp,
+                            fontWeight = FontWeight.Black,
+                            fontFamily = FontFamily.Monospace,
+                            letterSpacing = 1.sp
+                        )
+                        if (stats.biomeBannerSubtitle.isNotEmpty()) {
+                            Text(
+                                text = stats.biomeBannerSubtitle,
+                                color = Color.White.copy(alpha = 0.85f),
+                                fontSize = 10.sp,
+                                fontWeight = FontWeight.Bold,
+                                fontFamily = FontFamily.Monospace,
+                                modifier = Modifier.padding(top = 2.dp)
+                            )
+                        }
+                    }
+                }
+
                 // Phase Reality Floating Watermark Banner
                 AnimatedVisibility(
                     visible = stats.isPhaseShiftActive,
@@ -623,6 +667,13 @@ fun TopStatusBar(
                     color = NeonGold,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Black,
+                    fontFamily = FontFamily.Monospace
+                )
+                Text(
+                    text = "Z${stats.currentBiomeZone} ${stats.currentBiomeName}",
+                    color = Color(stats.biomeAccentColorHex),
+                    fontSize = 8.5.sp,
+                    fontWeight = FontWeight.Bold,
                     fontFamily = FontFamily.Monospace
                 )
             }

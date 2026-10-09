@@ -7,6 +7,7 @@ import com.example.longrunner.game.graphics.Mesh
 import com.example.longrunner.game.graphics.PerformanceProfile
 import com.example.longrunner.game.graphics.Shader
 import com.example.longrunner.game.obstacles.Obstacle
+import com.example.longrunner.game.world.biomes.BiomeType
 
 enum class SegmentType {
     METRO_STRAIGHT,
@@ -28,6 +29,8 @@ class TrackSegment(val segmentIndex: Int) {
 
     var type: SegmentType = SegmentType.METRO_STRAIGHT
     var fractureType: FractureType = FractureType.NONE
+    var biomeType: BiomeType = BiomeType.SUBWAY_DEPOT
+    var isTransitionGateway: Boolean = false
 
     var elevationStart: Float = 0.0f
     var elevationEnd: Float = 0.0f
@@ -46,11 +49,15 @@ class TrackSegment(val segmentIndex: Int) {
     fun reset(
         startZ: Float,
         type: SegmentType = SegmentType.METRO_STRAIGHT,
-        fractureType: FractureType = FractureType.NONE
+        fractureType: FractureType = FractureType.NONE,
+        biomeType: BiomeType = BiomeType.SUBWAY_DEPOT,
+        isTransitionGateway: Boolean = false
     ) {
         this.startZ = startZ
         this.type = type
         this.fractureType = fractureType
+        this.biomeType = biomeType
+        this.isTransitionGateway = isTransitionGateway
 
         when (type) {
             SegmentType.FRACTURE_OVERPASS_RAMP_UP -> {
@@ -99,6 +106,15 @@ class TrackSegment(val segmentIndex: Int) {
         rampUpRoadMesh: Mesh,
         elevatedRoadMesh: Mesh,
         rampDownRoadMesh: Mesh,
+        subwayRoadMesh: Mesh,
+        canyonRoadMesh: Mesh,
+        ruinsRoadMesh: Mesh,
+        orbitalRoadMesh: Mesh,
+        subwaySceneryMesh: Mesh,
+        canyonSceneryMesh: Mesh,
+        ruinsSceneryMesh: Mesh,
+        orbitalSceneryMesh: Mesh,
+        transitGatewayMesh: Mesh,
         buildingMesh: Mesh,
         tunnelMesh: Mesh,
         bridgeMesh: Mesh,
@@ -137,19 +153,33 @@ class TrackSegment(val segmentIndex: Int) {
         shader.setModelMatrix(modelMatrix.values)
         shader.setMVPMatrix(mvpMatrix.values)
 
-        // Select road geometry based on elevation profile
+        // Select road geometry based on elevation profile or dynamic biome type
         when (type) {
             SegmentType.FRACTURE_OVERPASS_RAMP_UP -> rampUpRoadMesh.render(shader)
             SegmentType.FRACTURE_OVERPASS -> elevatedRoadMesh.render(shader)
             SegmentType.FRACTURE_OVERPASS_RAMP_DOWN -> rampDownRoadMesh.render(shader)
-            else -> roadMesh.render(shader)
+            else -> {
+                when (biomeType) {
+                    BiomeType.SUBWAY_DEPOT -> subwayRoadMesh.render(shader)
+                    BiomeType.DESERT_CANYON -> canyonRoadMesh.render(shader)
+                    BiomeType.OVERGROWN_RUINS -> ruinsRoadMesh.render(shader)
+                    BiomeType.ORBITAL_SKYDECK -> orbitalRoadMesh.render(shader)
+                }
+            }
         }
 
-        // Render modular scenery decor based on segment type (respecting background scenery toggle)
+        // Render modular scenery decor based on biome and segment type
         val renderSceneryBuildings = performanceProfile.enableBackgroundScenery
         when (type) {
             SegmentType.METRO_STRAIGHT -> {
-                if (renderSceneryBuildings) buildingMesh.render(shader)
+                if (renderSceneryBuildings) {
+                    when (biomeType) {
+                        BiomeType.SUBWAY_DEPOT -> subwaySceneryMesh.render(shader)
+                        BiomeType.DESERT_CANYON -> canyonSceneryMesh.render(shader)
+                        BiomeType.OVERGROWN_RUINS -> ruinsSceneryMesh.render(shader)
+                        BiomeType.ORBITAL_SKYDECK -> orbitalSceneryMesh.render(shader)
+                    }
+                }
             }
             SegmentType.NEON_TUNNEL -> {
                 tunnelMesh.render(shader)
@@ -158,7 +188,14 @@ class TrackSegment(val segmentIndex: Int) {
                 bridgeMesh.render(shader)
             }
             SegmentType.OVERPASS_GANTRY -> {
-                if (renderSceneryBuildings) buildingMesh.render(shader)
+                if (renderSceneryBuildings) {
+                    when (biomeType) {
+                        BiomeType.SUBWAY_DEPOT -> subwaySceneryMesh.render(shader)
+                        BiomeType.DESERT_CANYON -> canyonSceneryMesh.render(shader)
+                        BiomeType.OVERGROWN_RUINS -> ruinsSceneryMesh.render(shader)
+                        BiomeType.ORBITAL_SKYDECK -> orbitalSceneryMesh.render(shader)
+                    }
+                }
                 gantryMesh.render(shader)
             }
             SegmentType.SOLAR_DISTRICT -> {
@@ -166,7 +203,14 @@ class TrackSegment(val segmentIndex: Int) {
             }
             SegmentType.FRACTURE_SPLIT -> {
                 fractureSplitDecorMesh.render(shader)
-                if (renderSceneryBuildings) buildingMesh.render(shader)
+                if (renderSceneryBuildings) {
+                    when (biomeType) {
+                        BiomeType.SUBWAY_DEPOT -> subwaySceneryMesh.render(shader)
+                        BiomeType.DESERT_CANYON -> canyonSceneryMesh.render(shader)
+                        BiomeType.OVERGROWN_RUINS -> ruinsSceneryMesh.render(shader)
+                        BiomeType.ORBITAL_SKYDECK -> orbitalSceneryMesh.render(shader)
+                    }
+                }
             }
             SegmentType.FRACTURE_OVERPASS_RAMP_UP,
             SegmentType.FRACTURE_OVERPASS,
@@ -175,8 +219,20 @@ class TrackSegment(val segmentIndex: Int) {
             }
             SegmentType.FRACTURE_MERGE -> {
                 gantryMesh.render(shader)
-                if (renderSceneryBuildings) buildingMesh.render(shader)
+                if (renderSceneryBuildings) {
+                    when (biomeType) {
+                        BiomeType.SUBWAY_DEPOT -> subwaySceneryMesh.render(shader)
+                        BiomeType.DESERT_CANYON -> canyonSceneryMesh.render(shader)
+                        BiomeType.OVERGROWN_RUINS -> ruinsSceneryMesh.render(shader)
+                        BiomeType.ORBITAL_SKYDECK -> orbitalSceneryMesh.render(shader)
+                    }
+                }
             }
+        }
+
+        // Render transition gateway portal at zone boundary thresholds
+        if (isTransitionGateway) {
+            transitGatewayMesh.render(shader)
         }
 
         // Render segment obstacles with distance culling

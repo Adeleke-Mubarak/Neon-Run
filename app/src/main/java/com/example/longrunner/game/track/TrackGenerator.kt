@@ -10,13 +10,15 @@ import com.example.longrunner.game.graphics.Shader
 import com.example.longrunner.game.obstacles.Obstacle
 import com.example.longrunner.game.obstacles.ObstacleType
 import com.example.longrunner.game.player.PlayerController
+import com.example.longrunner.game.world.biomes.BiomeManager
 import java.util.Random
 import kotlin.math.abs
 
 class TrackGenerator(
     val random: Random = Random(),
     val validationSystem: ObstacleValidationSystem = ObstacleValidationSystem(),
-    val fractureManager: FractureManager = FractureManager()
+    val fractureManager: FractureManager = FractureManager(),
+    val biomeManager: BiomeManager = BiomeManager()
 ) {
 
     val segments = ArrayList<TrackSegment>()
@@ -34,11 +36,20 @@ class TrackGenerator(
         totalSegmentsGenerated = 0
         furthestZ = 0f
         fractureManager.reset()
+        biomeManager.reset()
 
         for (segment in segments) {
             val isWarmup = totalSegmentsGenerated < 1
-            val segmentType = if (isWarmup) SegmentType.METRO_STRAIGHT else selectSegmentType(abs(furthestZ))
-            segment.reset(furthestZ, segmentType)
+            val dist = abs(furthestZ)
+            val segmentType = if (isWarmup) SegmentType.METRO_STRAIGHT else selectSegmentType(dist)
+            val biome = biomeManager.getBiomeAtDistance(dist)
+            val isGateway = biomeManager.isTransitionGateway(dist)
+            segment.reset(
+                furthestZ,
+                segmentType,
+                biomeType = biome.type,
+                isTransitionGateway = isGateway
+            )
             populateSegment(segment, isWarmup = isWarmup)
             furthestZ = segment.endZ
             totalSegmentsGenerated++
@@ -75,7 +86,14 @@ class TrackGenerator(
                 // Recycle this segment to the front with dynamic environment selection
                 val dist = abs(furthestZ)
                 val newType = selectSegmentType(dist)
-                segment.reset(furthestZ, newType)
+                val biome = biomeManager.getBiomeAtDistance(dist)
+                val isGateway = biomeManager.isTransitionGateway(dist)
+                segment.reset(
+                    furthestZ,
+                    newType,
+                    biomeType = biome.type,
+                    isTransitionGateway = isGateway
+                )
                 populateSegment(segment, isWarmup = false)
                 furthestZ = segment.endZ
                 totalSegmentsGenerated++
@@ -443,6 +461,15 @@ class TrackGenerator(
         rampUpRoadMesh: Mesh,
         elevatedRoadMesh: Mesh,
         rampDownRoadMesh: Mesh,
+        subwayRoadMesh: Mesh,
+        canyonRoadMesh: Mesh,
+        ruinsRoadMesh: Mesh,
+        orbitalRoadMesh: Mesh,
+        subwaySceneryMesh: Mesh,
+        canyonSceneryMesh: Mesh,
+        ruinsSceneryMesh: Mesh,
+        orbitalSceneryMesh: Mesh,
+        transitGatewayMesh: Mesh,
         buildingMesh: Mesh,
         tunnelMesh: Mesh,
         bridgeMesh: Mesh,
@@ -478,6 +505,15 @@ class TrackGenerator(
                 rampUpRoadMesh,
                 elevatedRoadMesh,
                 rampDownRoadMesh,
+                subwayRoadMesh,
+                canyonRoadMesh,
+                ruinsRoadMesh,
+                orbitalRoadMesh,
+                subwaySceneryMesh,
+                canyonSceneryMesh,
+                ruinsSceneryMesh,
+                orbitalSceneryMesh,
+                transitGatewayMesh,
                 buildingMesh,
                 tunnelMesh,
                 bridgeMesh,

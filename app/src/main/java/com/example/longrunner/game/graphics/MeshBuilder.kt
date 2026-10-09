@@ -756,5 +756,321 @@ class MeshBuilder {
             builder.addBox(0f, 0.05f, 0f, 2.2f, 0.06f, 2.2f, Material.DRONE_SCANNER_RED)
             return builder.build()
         }
+
+        // ==========================================
+        // BIOME 1: METRO TRANSIT & RAIL DEPOT MESHES
+        // ==========================================
+
+        fun createSubwayRoadMesh(width: Float, length: Float): Mesh {
+            val builder = MeshBuilder()
+            // Dark gravel ballast track bed
+            builder.addBox(0f, -0.1f, -length * 0.5f, width, 0.2f, length, Material.SUBWAY_BALLAST)
+
+            // Wooden railroad sleepers spaced along the track
+            var curZ = 0.0f
+            while (curZ > -length) {
+                builder.addBox(0f, 0.01f, curZ, width * 0.88f, 0.035f, 0.38f, Material.SUBWAY_SLEEPER_WOOD)
+                curZ -= 1.8f
+            }
+
+            // 3 pairs of steel rails (one pair per lane: -2.2m, 0.0m, +2.2m)
+            val laneCenters = floatArrayOf(-2.2f, 0.0f, 2.2f)
+            val railGaugeHalf = 0.42f
+            for (lx in laneCenters) {
+                builder.addBox(lx - railGaugeHalf, 0.05f, -length * 0.5f, 0.09f, 0.08f, length, Material.SUBWAY_RAIL_STEEL)
+                builder.addBox(lx + railGaugeHalf, 0.05f, -length * 0.5f, 0.09f, 0.08f, length, Material.SUBWAY_RAIL_STEEL)
+            }
+
+            // Industrial concrete cable troughs & glowing amber caution curbs
+            val curbWidth = 0.45f
+            val curbHeight = 0.35f
+            builder.addBox(-width * 0.5f - curbWidth * 0.5f, curbHeight * 0.5f, -length * 0.5f, curbWidth, curbHeight, length, Material.SUBWAY_PLATFORM_WALL)
+            builder.addBox(-width * 0.5f, curbHeight + 0.02f, -length * 0.5f, 0.12f, 0.04f, length, Material.SUBWAY_SIGNAL_AMBER)
+            builder.addBox(width * 0.5f + curbWidth * 0.5f, curbHeight * 0.5f, -length * 0.5f, curbWidth, curbHeight, length, Material.SUBWAY_PLATFORM_WALL)
+            builder.addBox(width * 0.5f, curbHeight + 0.02f, -length * 0.5f, 0.12f, 0.04f, length, Material.SUBWAY_SIGNAL_AMBER)
+
+            return builder.build()
+        }
+
+        fun createSubwaySceneryMesh(): Mesh {
+            val builder = MeshBuilder()
+
+            // LEFT SIDE: Elevated Metro Passenger Station Platform
+            builder.addBox(-8.0f, 1.2f, -15.0f, 4.2f, 2.4f, 30.0f, Material.SUBWAY_PLATFORM_WALL)
+            builder.addBox(-6.0f, 2.42f, -15.0f, 0.35f, 0.04f, 30.0f, Material.SUBWAY_SIGNAL_AMBER)
+            // Station canopy roof & pillars
+            builder.addBox(-8.0f, 6.2f, -15.0f, 4.6f, 0.4f, 30.0f, Material.BUILDING_DARK)
+            builder.addBox(-7.5f, 3.8f, -6.0f, 0.4f, 4.8f, 0.4f, Material.SUBWAY_PLATFORM_WALL)
+            builder.addBox(-7.5f, 3.8f, -22.0f, 0.4f, 4.8f, 0.4f, Material.SUBWAY_PLATFORM_WALL)
+
+            // RIGHT SIDE: Siding Track with Parked Futuristic Maglev Train Car
+            builder.addBox(8.2f, -0.05f, -15.0f, 3.8f, 0.15f, 30.0f, Material.SUBWAY_BALLAST)
+            // Maglev train chassis & sleek aerodynamic body
+            builder.addBox(8.2f, 1.6f, -15.0f, 2.6f, 2.8f, 22.0f, Material.SUBWAY_TRAIN_BODY)
+            builder.addBox(8.2f, 1.8f, -15.0f, 2.65f, 0.8f, 21.0f, Material.BUILDING_DARK) // Dark panoramic windows
+            builder.addBox(6.85f, 0.6f, -15.0f, 0.08f, 0.18f, 22.0f, Material.SUBWAY_TRAIN_ACCENT) // Glowing red mag-lev speed stripe
+            builder.addBox(6.85f, 2.6f, -15.0f, 0.08f, 0.12f, 22.0f, Material.ROAD_LANE_CYAN)
+
+            // Overhead steel girder signal gantry with amber status cluster
+            builder.addBox(-5.2f, 3.5f, -14.0f, 0.45f, 7.0f, 0.45f, Material.GANTRY_STRUCTURE)
+            builder.addBox(5.2f, 3.5f, -14.0f, 0.45f, 7.0f, 0.45f, Material.GANTRY_STRUCTURE)
+            builder.addBox(0f, 6.8f, -14.0f, 10.8f, 0.5f, 0.45f, Material.GANTRY_STRUCTURE)
+            builder.addBox(0f, 6.4f, -13.8f, 1.8f, 0.35f, 0.15f, Material.SUBWAY_SIGNAL_AMBER)
+
+            return builder.build()
+        }
+
+        // ==========================================
+        // BIOME 2: RUSTFALL DESERT CANYON MESHES
+        // ==========================================
+
+        fun createDesertCanyonRoadMesh(width: Float, length: Float): Mesh {
+            val builder = MeshBuilder()
+            // Arid sandstone roadbed with natural strata
+            builder.addBox(0f, -0.1f, -length * 0.5f, width, 0.2f, length, Material.CANYON_SANDSTONE_DARK)
+
+            // Timber trestle reinforcement ties
+            var curZ = 0.0f
+            while (curZ > -length) {
+                builder.addBox(0f, 0.01f, curZ, width * 0.92f, 0.035f, 0.45f, Material.CANYON_TRESTLE_WOOD)
+                curZ -= 2.6f
+            }
+
+            // Warm sunset amber lane divider markers
+            val dashLength = 3.8f
+            val gapLength = 3.2f
+            curZ = 0.0f
+            while (curZ > -length) {
+                val zCenter = curZ - dashLength * 0.5f
+                builder.addBox(-1.1f, 0.02f, zCenter, 0.14f, 0.04f, dashLength, Material.CANYON_SUNSET_AMBER)
+                builder.addBox(1.1f, 0.02f, zCenter, 0.14f, 0.04f, dashLength, Material.CANYON_SUNSET_AMBER)
+                curZ -= (dashLength + gapLength)
+            }
+
+            // Natural sandstone rock curbs with heavy timber edge barriers
+            val curbWidth = 0.5f
+            val curbHeight = 0.38f
+            builder.addBox(-width * 0.5f - curbWidth * 0.5f, curbHeight * 0.5f, -length * 0.5f, curbWidth, curbHeight, length, Material.CANYON_SANDSTONE_LIGHT)
+            builder.addBox(-width * 0.5f - curbWidth * 0.5f, curbHeight + 0.15f, -length * 0.5f, 0.2f, 0.25f, length, Material.CANYON_TRESTLE_WOOD)
+
+            builder.addBox(width * 0.5f + curbWidth * 0.5f, curbHeight * 0.5f, -length * 0.5f, curbWidth, curbHeight, length, Material.CANYON_SANDSTONE_LIGHT)
+            builder.addBox(width * 0.5f + curbWidth * 0.5f, curbHeight + 0.15f, -length * 0.5f, 0.2f, 0.25f, length, Material.CANYON_TRESTLE_WOOD)
+
+            return builder.build()
+        }
+
+        fun createDesertCanyonSceneryMesh(): Mesh {
+            val builder = MeshBuilder()
+
+            // LEFT SIDE: Towering Sandstone Canyon Cliff Formations & Saguaro Cactus
+            // Base canyon bluff
+            builder.addBox(-9.5f, 8.0f, -15.0f, 6.5f, 16.0f, 30.0f, Material.CANYON_SANDSTONE_DARK)
+            builder.addBox(-7.5f, 5.0f, -12.0f, 2.5f, 10.0f, 14.0f, Material.CANYON_SANDSTONE_LIGHT)
+            builder.addBox(-9.0f, 16.0f, -20.0f, 5.5f, 8.0f, 12.0f, Material.CANYON_SANDSTONE_DARK)
+
+            // Tall Desert Saguaro Cactus (left)
+            builder.addBox(-5.8f, 2.2f, -7.0f, 0.42f, 4.4f, 0.42f, Material.CANYON_CACTUS_GREEN)
+            // Left branch
+            builder.addBox(-6.2f, 2.5f, -7.0f, 0.7f, 0.35f, 0.35f, Material.CANYON_CACTUS_GREEN)
+            builder.addBox(-6.55f, 3.4f, -7.0f, 0.35f, 1.8f, 0.35f, Material.CANYON_CACTUS_GREEN)
+            // Right branch
+            builder.addBox(-5.4f, 2.9f, -7.0f, 0.7f, 0.35f, 0.35f, Material.CANYON_CACTUS_GREEN)
+            builder.addBox(-5.05f, 3.7f, -7.0f, 0.35f, 1.6f, 0.35f, Material.CANYON_CACTUS_GREEN)
+
+            // RIGHT SIDE: Sandstone Pinnacles, Rust Fuel Pipeline, and Desert Shrubbery
+            builder.addBox(9.5f, 9.0f, -15.0f, 6.5f, 18.0f, 30.0f, Material.CANYON_SANDSTONE_DARK)
+            builder.addBox(7.8f, 4.0f, -18.0f, 3.0f, 8.0f, 12.0f, Material.CANYON_SANDSTONE_LIGHT)
+
+            // Elevated Industrial Rust Fuel Pipeline on Trestles
+            builder.addBox(6.4f, 4.2f, -15.0f, 0.65f, 0.65f, 30.0f, Material.CANYON_RUST_PIPE)
+            // A-frame trestle supports
+            builder.addBox(6.4f, 2.0f, -6.0f, 0.3f, 4.0f, 0.3f, Material.CANYON_TRESTLE_WOOD)
+            builder.addBox(6.4f, 2.0f, -22.0f, 0.3f, 4.0f, 0.3f, Material.CANYON_TRESTLE_WOOD)
+
+            // Second Saguaro Cactus (right)
+            builder.addBox(5.6f, 1.8f, -25.0f, 0.38f, 3.6f, 0.38f, Material.CANYON_CACTUS_GREEN)
+            builder.addBox(5.95f, 2.2f, -25.0f, 0.6f, 0.3f, 0.3f, Material.CANYON_CACTUS_GREEN)
+            builder.addBox(6.25f, 3.0f, -25.0f, 0.3f, 1.6f, 0.3f, Material.CANYON_CACTUS_GREEN)
+
+            return builder.build()
+        }
+
+        // ==========================================
+        // BIOME 3: BIOLUMINESCENT JUNGLE RUINS MESHES
+        // ==========================================
+
+        fun createRuinsViaductRoadMesh(width: Float, length: Float): Mesh {
+            val builder = MeshBuilder()
+            // Ancient weathered stone roadway deck
+            builder.addBox(0f, -0.1f, -length * 0.5f, width, 0.2f, length, Material.RUINS_STONE_ANCIENT)
+
+            // Moss-covered flagstone stepping bands
+            var curZ = 0.0f
+            while (curZ > -length) {
+                builder.addBox(0f, 0.01f, curZ, width * 0.85f, 0.03f, 0.8f, Material.RUINS_MOSS_GREEN)
+                curZ -= 3.2f
+            }
+
+            // Emerald bioluminescent rune vine dividers
+            val dashLength = 3.5f
+            val gapLength = 2.5f
+            curZ = 0.0f
+            while (curZ > -length) {
+                val zCenter = curZ - dashLength * 0.5f
+                builder.addBox(-1.1f, 0.02f, zCenter, 0.16f, 0.04f, dashLength, Material.RUINS_GLOW_FLORA)
+                builder.addBox(1.1f, 0.02f, zCenter, 0.16f, 0.04f, dashLength, Material.RUINS_GLOW_FLORA)
+                curZ -= (dashLength + gapLength)
+            }
+
+            // Heavy carved stone curbs entwined with moss and glowing flora pods
+            val curbWidth = 0.55f
+            val curbHeight = 0.42f
+            builder.addBox(-width * 0.5f - curbWidth * 0.5f, curbHeight * 0.5f, -length * 0.5f, curbWidth, curbHeight, length, Material.RUINS_STONE_ANCIENT)
+            builder.addBox(-width * 0.5f - curbWidth * 0.5f, curbHeight + 0.08f, -length * 0.5f, 0.25f, 0.15f, length, Material.RUINS_MOSS_GREEN)
+            // Periodic glowing flora gems along curbs
+            curZ = -4.0f
+            while (curZ > -length) {
+                builder.addOctahedron(-width * 0.5f - curbWidth * 0.5f, curbHeight + 0.22f, curZ, 0.14f, Material.RUINS_GLOW_FLORA)
+                builder.addOctahedron(width * 0.5f + curbWidth * 0.5f, curbHeight + 0.22f, curZ, 0.14f, Material.RUINS_GLOW_FLORA)
+                curZ -= 6.0f
+            }
+
+            builder.addBox(width * 0.5f + curbWidth * 0.5f, curbHeight * 0.5f, -length * 0.5f, curbWidth, curbHeight, length, Material.RUINS_STONE_ANCIENT)
+            builder.addBox(width * 0.5f + curbWidth * 0.5f, curbHeight + 0.08f, -length * 0.5f, 0.25f, 0.15f, length, Material.RUINS_MOSS_GREEN)
+
+            return builder.build()
+        }
+
+        fun createOvergrownRuinsSceneryMesh(): Mesh {
+            val builder = MeshBuilder()
+
+            // LEFT SIDE: Massive Ancient Stone Monolith Pillars & Giant Tree Trunk
+            // Monolith pillar 1
+            builder.addBox(-7.5f, 6.0f, -8.0f, 2.2f, 12.0f, 2.2f, Material.RUINS_STONE_ANCIENT)
+            builder.addBox(-7.5f, 10.0f, -8.0f, 2.3f, 4.0f, 2.3f, Material.RUINS_MOSS_GREEN)
+            // Monolith pillar 2 (partially collapsed)
+            builder.addBox(-8.0f, 3.5f, -22.0f, 2.4f, 7.0f, 2.4f, Material.RUINS_STONE_ANCIENT)
+
+            // Giant ancient gnarled tree trunk
+            builder.addBox(-9.5f, 8.0f, -15.0f, 3.2f, 16.0f, 3.2f, Material.RUINS_TREE_BARK)
+            // Overhanging tree branches
+            builder.addBox(-6.8f, 12.0f, -15.0f, 4.0f, 1.2f, 1.8f, Material.RUINS_TREE_BARK)
+            builder.addBox(-6.0f, 12.8f, -15.0f, 3.2f, 1.8f, 2.4f, Material.RUINS_MOSS_GREEN)
+
+            // Floating / hanging bioluminescent spore bulbs
+            builder.addOctahedron(-6.0f, 9.5f, -15.0f, 0.55f, Material.RUINS_VIOLET_SPORE)
+            builder.addOctahedron(-7.2f, 7.0f, -10.0f, 0.40f, Material.RUINS_GLOW_FLORA)
+
+            // RIGHT SIDE: Ancient Stone Archway & Glowing Flora Shrines
+            // Collapsed archway
+            builder.addBox(7.5f, 5.0f, -12.0f, 2.0f, 10.0f, 2.0f, Material.RUINS_STONE_ANCIENT)
+            builder.addBox(7.5f, 9.5f, -12.0f, 2.2f, 2.0f, 2.2f, Material.RUINS_MOSS_GREEN)
+            builder.addBox(9.5f, 7.0f, -18.0f, 3.5f, 14.0f, 3.5f, Material.RUINS_TREE_BARK)
+
+            // Glowing flora lanterns and mystical violet spores
+            builder.addOctahedron(6.2f, 2.8f, -7.0f, 0.45f, Material.RUINS_GLOW_FLORA)
+            builder.addOctahedron(6.8f, 4.2f, -20.0f, 0.50f, Material.RUINS_VIOLET_SPORE)
+
+            return builder.build()
+        }
+
+        // ==========================================
+        // BIOME 4: ORBITAL SKYDECK MESHES
+        // ==========================================
+
+        fun createOrbitalSkydeckRoadMesh(width: Float, length: Float): Mesh {
+            val builder = MeshBuilder()
+            // Translucent deep-blue aerospace glass road deck
+            builder.addBox(0f, -0.1f, -length * 0.5f, width, 0.2f, length, Material.ORBITAL_GLASS_FLOOR)
+
+            // Photovoltaic solar array substrate visible under glass
+            var curZ = 0.0f
+            while (curZ > -length) {
+                builder.addBox(0f, -0.06f, curZ, width * 0.88f, 0.04f, 1.2f, Material.ORBITAL_SOLAR_BLUE)
+                curZ -= 2.4f
+            }
+
+            // Crisp solar-gold power strip lane markings
+            val dashLength = 4.2f
+            val gapLength = 2.8f
+            curZ = 0.0f
+            while (curZ > -length) {
+                val zCenter = curZ - dashLength * 0.5f
+                builder.addBox(-1.1f, 0.02f, zCenter, 0.14f, 0.04f, dashLength, Material.ORBITAL_GOLD_TRIM)
+                builder.addBox(1.1f, 0.02f, zCenter, 0.14f, 0.04f, dashLength, Material.ORBITAL_GOLD_TRIM)
+                curZ -= (dashLength + gapLength)
+            }
+
+            // High-luster white aerospace chassis curbs with holographic cyan guide rails
+            val curbWidth = 0.5f
+            val curbHeight = 0.4f
+            builder.addBox(-width * 0.5f - curbWidth * 0.5f, curbHeight * 0.5f, -length * 0.5f, curbWidth, curbHeight, length, Material.ORBITAL_WHITE_CHASSIS)
+            builder.addBox(-width * 0.5f - curbWidth * 0.5f, curbHeight + 0.12f, -length * 0.5f, 0.16f, 0.12f, length, Material.ORBITAL_HOLOGRAM_CYAN)
+
+            builder.addBox(width * 0.5f + curbWidth * 0.5f, curbHeight * 0.5f, -length * 0.5f, curbWidth, curbHeight, length, Material.ORBITAL_WHITE_CHASSIS)
+            builder.addBox(width * 0.5f + curbWidth * 0.5f, curbHeight + 0.12f, -length * 0.5f, 0.16f, 0.12f, length, Material.ORBITAL_HOLOGRAM_CYAN)
+
+            return builder.build()
+        }
+
+        fun createOrbitalSkydeckSceneryMesh(): Mesh {
+            val builder = MeshBuilder()
+
+            // LEFT SIDE: Floating Solar Wing Array & Aerospace Girder Spire
+            builder.addBox(-8.0f, 5.0f, -15.0f, 0.6f, 10.0f, 0.6f, Material.ORBITAL_WHITE_CHASSIS)
+            // Giant photovoltaic wing
+            builder.addBox(-8.0f, 7.5f, -15.0f, 4.8f, 0.15f, 16.0f, Material.ORBITAL_SOLAR_BLUE)
+            builder.addBox(-8.0f, 7.5f, -15.0f, 5.0f, 0.22f, 0.3f, Material.ORBITAL_GOLD_TRIM)
+            // Telemetry transceiver pod
+            builder.addBox(-6.0f, 2.5f, -10.0f, 1.2f, 1.2f, 1.2f, Material.ORBITAL_WHITE_CHASSIS)
+            builder.addOctahedron(-6.0f, 3.5f, -10.0f, 0.45f, Material.ORBITAL_HOLOGRAM_CYAN)
+
+            // RIGHT SIDE: Orbital Comm Spire & Holographic Navigation Beacon
+            builder.addBox(8.0f, 10.0f, -18.0f, 0.8f, 20.0f, 0.8f, Material.ORBITAL_WHITE_CHASSIS)
+            builder.addBox(8.0f, 16.0f, -18.0f, 3.2f, 0.15f, 12.0f, Material.ORBITAL_SOLAR_BLUE)
+            // Holographic beacon diamond projector
+            builder.addBox(6.4f, 2.8f, -8.0f, 0.8f, 0.8f, 0.8f, Material.ORBITAL_WHITE_CHASSIS)
+            builder.addOctahedron(6.4f, 4.0f, -8.0f, 0.6f, Material.ORBITAL_GOLD_TRIM)
+            builder.addBox(6.4f, 4.0f, -8.0f, 1.6f, 0.08f, 1.6f, Material.ORBITAL_HOLOGRAM_CYAN)
+
+            return builder.build()
+        }
+
+        // ==========================================
+        // TRANSIT GATEWAY PORTAL MESH (ZONE BOUNDARY)
+        // ==========================================
+
+        /**
+         * Monumental Hyperspace Transit Gateway: Spans across the track at zone thresholds
+         * (900m, 1,800m, 2,800m) with massive structural pylons and shimmering energy rings.
+         */
+        fun createTransitGatewayMesh(): Mesh {
+            val builder = MeshBuilder()
+            val gateZ = -15.0f
+            val pylonHeight = 8.5f
+
+            // Left & Right massive hyper-gateway pylons
+            builder.addBox(-5.4f, pylonHeight * 0.5f, gateZ, 0.9f, pylonHeight, 1.2f, Material.BUILDING_DARK)
+            builder.addBox(-5.4f, pylonHeight * 0.5f, gateZ, 1.0f, pylonHeight * 0.85f, 0.4f, Material.ORBITAL_WHITE_CHASSIS)
+            builder.addBox(-5.4f, pylonHeight + 0.3f, gateZ, 0.5f, 0.5f, 0.5f, Material.HURDLE_AMBER) // Warning beacon
+
+            builder.addBox(5.4f, pylonHeight * 0.5f, gateZ, 0.9f, pylonHeight, 1.2f, Material.BUILDING_DARK)
+            builder.addBox(5.4f, pylonHeight * 0.5f, gateZ, 1.0f, pylonHeight * 0.85f, 0.4f, Material.ORBITAL_WHITE_CHASSIS)
+            builder.addBox(5.4f, pylonHeight + 0.3f, gateZ, 0.5f, 0.5f, 0.5f, Material.HURDLE_AMBER) // Warning beacon
+
+            // Heavy overhead portal lintel
+            builder.addBox(0f, pylonHeight, gateZ, 11.7f, 1.2f, 1.4f, Material.BUILDING_DARK)
+            builder.addBox(0f, pylonHeight, gateZ, 11.2f, 0.4f, 1.5f, Material.ORBITAL_WHITE_CHASSIS)
+
+            // Inner shimmering energy portal field rings
+            // Outer ring (Cyan)
+            builder.addBox(0f, 4.4f, gateZ, 9.6f, 6.2f, 0.15f, Material.LASER_CYAN)
+            // Accent energy ring (Magenta)
+            builder.addBox(0f, 4.4f, gateZ - 0.2f, 8.4f, 5.2f, 0.1f, Material.ROAD_CURB_MAGENTA)
+            // Central opening pass-through clearance frame (dark hollow center)
+            builder.addBox(0f, 3.8f, gateZ + 0.1f, 7.2f, 4.8f, 0.2f, Material.ORBITAL_GOLD_TRIM)
+
+            return builder.build()
+        }
     }
 }
