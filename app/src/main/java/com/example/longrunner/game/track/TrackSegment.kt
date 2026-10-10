@@ -157,11 +157,6 @@ class TrackSegment(val segmentIndex: Int) {
         // Select road geometry
         if (subwayEnvRenderer != null && subwayEnvRenderer.isLoaded) {
             subwayEnvRenderer.renderTrack(vpMatrix, startZ, length)
-            subwayEnvRenderer.renderScenery(vpMatrix, startZ)
-            if (type == SegmentType.SKY_BRIDGE || type == SegmentType.OVERPASS_GANTRY ||
-                type == SegmentType.NEON_TUNNEL || type == SegmentType.SOLAR_DISTRICT) {
-                subwayEnvRenderer.renderBridge(vpMatrix, startZ)
-            }
             shader.bind()
         } else {
             when (type) {

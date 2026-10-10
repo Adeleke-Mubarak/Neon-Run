@@ -159,9 +159,6 @@ class Obstacle(
                     shader.bind()
                     return
                 }
-                else -> {
-                    // Fall through to procedural mesh render for other dynamic obstacles
-                }
             }
         }
 

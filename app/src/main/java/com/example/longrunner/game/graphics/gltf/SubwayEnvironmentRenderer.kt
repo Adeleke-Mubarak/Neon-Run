@@ -49,16 +49,11 @@ class SubwayEnvironmentRenderer(context: Context, modelAssetPath: String = "mode
                 }
 
                 trainPrimitives = loadedModel.findPrimitives { prim ->
-                    prim.name.contains("Train", ignoreCase = true) ||
-                            prim.name.contains("274") ||
-                            prim.name.contains("276") ||
-                            prim.name.contains("270")
+                    prim.name.contains("Train", ignoreCase = true)
                 }
 
                 hurdlePrimitives = loadedModel.findPrimitives { prim ->
-                    prim.name.contains("Obstacle", ignoreCase = true) ||
-                            prim.name.contains("252") ||
-                            prim.name.contains("253")
+                    prim.name.contains("Obstacle", ignoreCase = true)
                 }
 
                 bridgePrimitives = loadedModel.findPrimitives { prim ->
@@ -112,14 +107,14 @@ class SubwayEnvironmentRenderer(context: Context, modelAssetPath: String = "mode
 
         // Center and length scaling
         // Raw Track: length dx=4222.2, width dy=2807.2, height dz=1333.6
-        // Raw center: cx = -3414.6f, cy = -1229.2f, czBase = 120.0f
+        // Raw center: cx = -3414.6f, cy = -1275.0f (exact center of 3 rails), czBase = 135.0f (rail top)
         val cx = -3414.6f
-        val cy = -1229.2f
-        val czBase = 120.0f
+        val cy = -1275.0f
+        val czBase = 135.0f
 
         val scaleLen = segmentLength / 4222.2f
-        val scaleWidth = 0.0095f
-        val scaleHeight = 0.0095f
+        val scaleWidth = 0.00978f
+        val scaleHeight = 0.00978f
         val centerZ = startZ - segmentLength * 0.5f
 
         // Standard column-major OpenGL transform:
@@ -175,7 +170,7 @@ class SubwayEnvironmentRenderer(context: Context, modelAssetPath: String = "mode
         val cx = -26715.4f
         val cy = -1333.1f
         val czBase = 119.3f
-        val s = 0.010f // Centimeters to meters
+        val s = 0.0090f // Centimeters to meters
 
         // worldX = (rawY - cy) * s + laneX
         // worldY = (rawZ - czBase) * s + y
@@ -230,8 +225,8 @@ class SubwayEnvironmentRenderer(context: Context, modelAssetPath: String = "mode
         val cy = -1268.2f
         val czBase = 121.4f
 
-        // Scaled to fit 3-meter lane (width ~2.7m, height ~1.4m)
-        val s = 0.0045f * (scaleMultiplier / 0.45f)
+        // Scaled to fit 2.2-meter lane (width ~2.15m)
+        val s = 0.0035f * (scaleMultiplier / 0.45f)
 
         // worldX = (rawX - cx) * s + laneX
         // worldY = (rawZ - czBase) * s + y
