@@ -138,7 +138,8 @@ class TrackSegment(val segmentIndex: Int) {
         timeBrakeOrbMesh: Mesh,
         magnetOrbMesh: Mesh,
         hoverboardOrbMesh: Mesh,
-        isPhaseShiftActive: Boolean = false
+        isPhaseShiftActive: Boolean = false,
+        subwayEnvRenderer: com.example.longrunner.game.graphics.gltf.SubwayEnvironmentRenderer? = null
     ) {
         // Occlusion & Horizon Distance Culling
         val endZ = startZ - length
@@ -160,7 +161,14 @@ class TrackSegment(val segmentIndex: Int) {
             SegmentType.FRACTURE_OVERPASS_RAMP_DOWN -> rampDownRoadMesh.render(shader)
             else -> {
                 when (biomeType) {
-                    BiomeType.CITY_STREETS -> subwayRoadMesh.render(shader)
+                    BiomeType.CITY_STREETS -> {
+                        if (subwayEnvRenderer != null && subwayEnvRenderer.isLoaded) {
+                            subwayEnvRenderer.renderTrack(vpMatrix, startZ, length)
+                            shader.bind()
+                        } else {
+                            subwayRoadMesh.render(shader)
+                        }
+                    }
                     BiomeType.DESERT_CANYON -> canyonRoadMesh.render(shader)
                     BiomeType.OVERGROWN_RUINS -> ruinsRoadMesh.render(shader)
                     BiomeType.ORBITAL_SKYDECK -> orbitalRoadMesh.render(shader)
@@ -174,7 +182,14 @@ class TrackSegment(val segmentIndex: Int) {
             SegmentType.METRO_STRAIGHT -> {
                 if (renderSceneryBuildings) {
                     when (biomeType) {
-                        BiomeType.CITY_STREETS -> subwaySceneryMesh.render(shader)
+                        BiomeType.CITY_STREETS -> {
+                            if (subwayEnvRenderer != null && subwayEnvRenderer.isLoaded) {
+                                subwayEnvRenderer.renderScenery(vpMatrix, startZ)
+                                shader.bind()
+                            } else {
+                                subwaySceneryMesh.render(shader)
+                            }
+                        }
                         BiomeType.DESERT_CANYON -> canyonSceneryMesh.render(shader)
                         BiomeType.OVERGROWN_RUINS -> ruinsSceneryMesh.render(shader)
                         BiomeType.ORBITAL_SKYDECK -> orbitalSceneryMesh.render(shader)
@@ -185,12 +200,24 @@ class TrackSegment(val segmentIndex: Int) {
                 tunnelMesh.render(shader)
             }
             SegmentType.SKY_BRIDGE -> {
-                bridgeMesh.render(shader)
+                if (subwayEnvRenderer != null && subwayEnvRenderer.isLoaded) {
+                    subwayEnvRenderer.renderBridge(vpMatrix, startZ)
+                    shader.bind()
+                } else {
+                    bridgeMesh.render(shader)
+                }
             }
             SegmentType.OVERPASS_GANTRY -> {
                 if (renderSceneryBuildings) {
                     when (biomeType) {
-                        BiomeType.CITY_STREETS -> subwaySceneryMesh.render(shader)
+                        BiomeType.CITY_STREETS -> {
+                            if (subwayEnvRenderer != null && subwayEnvRenderer.isLoaded) {
+                                subwayEnvRenderer.renderScenery(vpMatrix, startZ)
+                                shader.bind()
+                            } else {
+                                subwaySceneryMesh.render(shader)
+                            }
+                        }
                         BiomeType.DESERT_CANYON -> canyonSceneryMesh.render(shader)
                         BiomeType.OVERGROWN_RUINS -> ruinsSceneryMesh.render(shader)
                         BiomeType.ORBITAL_SKYDECK -> orbitalSceneryMesh.render(shader)
@@ -205,7 +232,14 @@ class TrackSegment(val segmentIndex: Int) {
                 fractureSplitDecorMesh.render(shader)
                 if (renderSceneryBuildings) {
                     when (biomeType) {
-                        BiomeType.CITY_STREETS -> subwaySceneryMesh.render(shader)
+                        BiomeType.CITY_STREETS -> {
+                            if (subwayEnvRenderer != null && subwayEnvRenderer.isLoaded) {
+                                subwayEnvRenderer.renderScenery(vpMatrix, startZ)
+                                shader.bind()
+                            } else {
+                                subwaySceneryMesh.render(shader)
+                            }
+                        }
                         BiomeType.DESERT_CANYON -> canyonSceneryMesh.render(shader)
                         BiomeType.OVERGROWN_RUINS -> ruinsSceneryMesh.render(shader)
                         BiomeType.ORBITAL_SKYDECK -> orbitalSceneryMesh.render(shader)
@@ -221,7 +255,14 @@ class TrackSegment(val segmentIndex: Int) {
                 gantryMesh.render(shader)
                 if (renderSceneryBuildings) {
                     when (biomeType) {
-                        BiomeType.CITY_STREETS -> subwaySceneryMesh.render(shader)
+                        BiomeType.CITY_STREETS -> {
+                            if (subwayEnvRenderer != null && subwayEnvRenderer.isLoaded) {
+                                subwayEnvRenderer.renderScenery(vpMatrix, startZ)
+                                shader.bind()
+                            } else {
+                                subwaySceneryMesh.render(shader)
+                            }
+                        }
                         BiomeType.DESERT_CANYON -> canyonSceneryMesh.render(shader)
                         BiomeType.OVERGROWN_RUINS -> ruinsSceneryMesh.render(shader)
                         BiomeType.ORBITAL_SKYDECK -> orbitalSceneryMesh.render(shader)
@@ -249,7 +290,8 @@ class TrackSegment(val segmentIndex: Int) {
                     patrolDroneMesh,
                     slidingGateMesh,
                     breakableCrateMesh,
-                    fallingDebrisMesh
+                    fallingDebrisMesh,
+                    subwayEnvRenderer = subwayEnvRenderer
                 )
             }
         }

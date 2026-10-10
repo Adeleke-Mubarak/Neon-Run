@@ -169,18 +169,27 @@ mat4 getBoneMatrix(int boneIndex) {
 }
 
 void main() {
-    mat4 skinMatrix = 
-        getBoneMatrix(int(a_Joints.x)) * a_Weights.x +
-        getBoneMatrix(int(a_Joints.y)) * a_Weights.y +
-        getBoneMatrix(int(a_Joints.z)) * a_Weights.z +
-        getBoneMatrix(int(a_Joints.w)) * a_Weights.w;
+    float totalWeight = a_Weights.x + a_Weights.y + a_Weights.z + a_Weights.w;
+    vec4 localPos;
+    vec3 localNormal;
+    if (totalWeight > 0.01) {
+        mat4 skinMatrix = 
+            getBoneMatrix(int(a_Joints.x)) * a_Weights.x +
+            getBoneMatrix(int(a_Joints.y)) * a_Weights.y +
+            getBoneMatrix(int(a_Joints.z)) * a_Weights.z +
+            getBoneMatrix(int(a_Joints.w)) * a_Weights.w;
+        localPos = skinMatrix * vec4(a_Position, 1.0);
+        localNormal = mat3(skinMatrix) * a_Normal;
+    } else {
+        localPos = vec4(a_Position, 1.0);
+        localNormal = a_Normal;
+    }
 
-    vec4 localPos = skinMatrix * vec4(a_Position, 1.0);
     vec4 worldPos = u_ModelMatrix * localPos;
     gl_Position = u_MVPMatrix * localPos;
 
     v_Position = worldPos.xyz;
-    v_Normal = normalize(mat3(u_ModelMatrix) * mat3(skinMatrix) * a_Normal);
+    v_Normal = normalize(mat3(u_ModelMatrix) * localNormal);
     v_TexCoord = a_TexCoord;
 }
 """

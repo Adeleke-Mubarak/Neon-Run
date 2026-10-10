@@ -493,7 +493,8 @@ class TrackGenerator(
         timeBrakeOrbMesh: Mesh,
         magnetOrbMesh: Mesh,
         hoverboardOrbMesh: Mesh,
-        isPhaseShiftActive: Boolean = false
+        isPhaseShiftActive: Boolean = false,
+        subwayEnvRenderer: com.example.longrunner.game.graphics.gltf.SubwayEnvironmentRenderer? = null
     ) {
         for (segment in segments) {
             segment.render(
@@ -537,7 +538,8 @@ class TrackGenerator(
                 timeBrakeOrbMesh,
                 magnetOrbMesh,
                 hoverboardOrbMesh,
-                isPhaseShiftActive
+                isPhaseShiftActive,
+                subwayEnvRenderer = subwayEnvRenderer
             )
         }
     }

@@ -92,12 +92,21 @@ class AABB(
  * 4x4 Transformation Matrix implemented in pure Kotlin.
  * Follows column-major layout standard for OpenGL ES shaders.
  */
-class Matrix4 {
+class Matrix4(initialValues: FloatArray? = null) {
     val values = FloatArray(16)
     private val temp = FloatArray(16)
 
     init {
-        identity()
+        if (initialValues != null && initialValues.size == 16) {
+            System.arraycopy(initialValues, 0, values, 0, 16)
+        } else {
+            identity()
+        }
+    }
+
+    fun set(array: FloatArray): Matrix4 {
+        System.arraycopy(array, 0, values, 0, 16)
+        return this
     }
 
     fun identity(): Matrix4 {

@@ -61,6 +61,7 @@ class Renderer3D(
 
     private var playerVisual: PlayerVisual? = null
     private var characterModelRenderer: com.example.longrunner.game.graphics.gltf.CharacterModelRenderer? = null
+    private var subwayEnvRenderer: com.example.longrunner.game.graphics.gltf.SubwayEnvironmentRenderer? = null
 
     private val modelMatrix = Matrix4()
     private val mvpMatrix = Matrix4()
@@ -142,6 +143,11 @@ class Renderer3D(
                 characterModelRenderer = com.example.longrunner.game.graphics.gltf.CharacterModelRenderer(ctx, initialModelPath)
             } catch (e: Exception) {
                 android.util.Log.e("Renderer3D", "Error initializing CharacterModelRenderer", e)
+            }
+            try {
+                subwayEnvRenderer = com.example.longrunner.game.graphics.gltf.SubwayEnvironmentRenderer(ctx)
+            } catch (e: Exception) {
+                android.util.Log.e("Renderer3D", "Error initializing SubwayEnvironmentRenderer", e)
             }
         }
         engine.particleSystem.initGl()
@@ -264,6 +270,27 @@ class Renderer3D(
         activeShader.setFog(fogR, fogG, fogB, scaledFogDensity)
         activeShader.setCameraPosition(camera.position.x, camera.position.y, camera.position.z)
 
+        // Update SubwayEnvironmentRenderer lighting & fog parameters
+        subwayEnvRenderer?.setLightingAndFog(
+            lightDirX = atmosphere.lightDirX,
+            lightDirY = atmosphere.lightDirY,
+            lightDirZ = atmosphere.lightDirZ,
+            lightR = lightR,
+            lightG = lightG,
+            lightB = lightB,
+            ambR = ambR,
+            ambG = ambG,
+            ambB = ambB,
+            fogR = fogR,
+            fogG = fogG,
+            fogB = fogB,
+            fogDensity = scaledFogDensity,
+            cameraX = camera.position.x,
+            cameraY = camera.position.y,
+            cameraZ = camera.position.z,
+            phaseTransition = phaseTransition
+        )
+
         // Render Track Segments, Obstacles, and Collectibles with distance culling
         engine.trackGenerator.render(
             activeShader,
@@ -306,7 +333,8 @@ class Renderer3D(
             timeBrakeOrbMesh = activeTimeBrakeOrb,
             magnetOrbMesh = activeMagnetOrb,
             hoverboardOrbMesh = activeHoverboardOrb,
-            isPhaseShiftActive = engine.phaseEnergyManager.isPhaseShiftActive
+            isPhaseShiftActive = engine.phaseEnergyManager.isPhaseShiftActive,
+            subwayEnvRenderer = subwayEnvRenderer
         )
 
         // Render Drone Swarm Searchlight Cone on Track if Swarm Event Active
@@ -477,6 +505,7 @@ class Renderer3D(
         droneSearchlightMesh?.release()
 
         characterModelRenderer?.release()
+        subwayEnvRenderer?.release()
         playerVisual?.release()
         engine.particleSystem.release()
     }

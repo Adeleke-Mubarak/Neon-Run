@@ -187,7 +187,35 @@ data class CharacterData(
             silhouetteType = SilhouetteType.ACROBATIC
         )
 
-        val ALL = listOf(KAI, ZARA, JAX, NOVA, MIRA)
+        val JAKE = CharacterData(
+            id = "jake",
+            name = "Jake",
+            role = "Subway Surfer",
+            personality = "Free-spirited graffiti artist and subway runner.",
+            description = "Iconic subway surfer with smooth lane transitions and classic street style.",
+            rarity = CharacterRarity.LEGENDARY,
+            speedModifier = 1.05f,
+            jumpModifier = 1.10f,
+            slideModifier = 1.05f,
+            phaseModifier = 1.0f,
+            laneSwitchModifier = 1.15f,
+            collisionTolerance = 0.08f,
+            abilityName = "Super Sneakers",
+            abilityDescription = "Leap high over trains and barriers with spring-loaded bounce.",
+            abilityCooldown = 15.0f,
+            abilityDuration = 4.0f,
+            passiveName = "Subway Legend",
+            passiveDescription = "High-agility street runner with smooth rail sliding.",
+            unlockCostCredits = 0,
+            unlockRequirementText = "Unlocked by default",
+            primaryColor = Material(0.12f, 0.40f, 0.85f, 1f, 0.1f),
+            accentColor = Material(1.0f, 0.85f, 0.0f, 1f, 0.95f),
+            uiColorHex = 0xFFFFCC00,
+            silhouetteType = SilhouetteType.BALANCED,
+            modelAssetPath = "models/character_endless_runner.glb"
+        )
+
+        val ALL = listOf(KAI, JAKE, ZARA, JAX, NOVA, MIRA)
 
         fun findById(id: String): CharacterData = ALL.find { it.id == id } ?: KAI
     }

@@ -133,9 +133,33 @@ class Obstacle(
         patrolDroneMesh: Mesh,
         slidingGateMesh: Mesh,
         breakableCrateMesh: Mesh,
-        fallingDebrisMesh: Mesh
+        fallingDebrisMesh: Mesh,
+        subwayEnvRenderer: com.example.longrunner.game.graphics.gltf.SubwayEnvironmentRenderer? = null
     ) {
         if (!isActive) return
+
+        if (subwayEnvRenderer != null && subwayEnvRenderer.isLoaded) {
+            when (type) {
+                ObstacleType.CYBER_BLOCK -> {
+                    subwayEnvRenderer.renderTrain(vpMatrix, currentX, currentY, z)
+                    shader.bind()
+                    return
+                }
+                ObstacleType.LOW_HURDLE -> {
+                    subwayEnvRenderer.renderHurdle(vpMatrix, currentX, currentY, z, scaleMultiplier = 0.40f)
+                    shader.bind()
+                    return
+                }
+                ObstacleType.HIGH_BEAM -> {
+                    subwayEnvRenderer.renderHurdle(vpMatrix, currentX, currentY + 1.25f, z, scaleMultiplier = 0.50f)
+                    shader.bind()
+                    return
+                }
+                else -> {
+                    // Fall through to procedural mesh render for other dynamic obstacles
+                }
+            }
+        }
 
         modelMatrix.identity()
         modelMatrix.translate(currentX, currentY, z)

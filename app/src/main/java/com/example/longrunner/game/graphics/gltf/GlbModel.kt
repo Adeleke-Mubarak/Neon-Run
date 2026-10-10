@@ -51,7 +51,14 @@ data class GlbPrimitive(
     val indexCount: Int,
     val diffuseTexId: Int,
     val glowTexId: Int,
-    val vboIds: IntArray
+    val vboIds: IntArray,
+    val name: String = "",
+    val minX: Float = 0f,
+    val minY: Float = 0f,
+    val minZ: Float = 0f,
+    val maxX: Float = 0f,
+    val maxY: Float = 0f,
+    val maxZ: Float = 0f
 )
 
 class GlbModel(
@@ -80,6 +87,17 @@ class GlbModel(
         GLES30.glBindVertexArray(0)
     }
 
+    fun renderPrimitive(prim: GlbPrimitive, shader: GlbSkinnedShader) {
+        shader.setTextures(prim.diffuseTexId, prim.glowTexId)
+        GLES30.glBindVertexArray(prim.vaoId)
+        GLES30.glDrawElements(GLES30.GL_TRIANGLES, prim.indexCount, GLES30.GL_UNSIGNED_SHORT, 0)
+        GLES30.glBindVertexArray(0)
+    }
+
+    fun findPrimitives(predicate: (GlbPrimitive) -> Boolean): List<GlbPrimitive> {
+        return primitives.filter(predicate)
+    }
+
     fun release() {
         for (prim in primitives) {
             GLES30.glDeleteVertexArrays(1, intArrayOf(prim.vaoId), 0)
@@ -92,6 +110,20 @@ class GlbModel(
     }
 
     companion object {
+        private var defaultWhiteTexId: Int = 0
+
+        fun getDefaultWhiteTexture(): Int {
+            if (defaultWhiteTexId != 0) return defaultWhiteTexId
+            val tex = IntArray(1)
+            GLES30.glGenTextures(1, tex, 0)
+            GLES30.glBindTexture(GLES30.GL_TEXTURE_2D, tex[0])
+            val whitePixels = ByteBuffer.allocateDirect(4).put(byteArrayOf(-1, -1, -1, -1)).position(0)
+            GLES30.glTexImage2D(GLES30.GL_TEXTURE_2D, 0, GLES30.GL_RGBA, 1, 1, 0, GLES30.GL_RGBA, GLES30.GL_UNSIGNED_BYTE, whitePixels)
+            GLES30.glTexParameteri(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_MIN_FILTER, GLES30.GL_NEAREST)
+            GLES30.glTexParameteri(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE_MAG_FILTER, GLES30.GL_NEAREST)
+            defaultWhiteTexId = tex[0]
+            return defaultWhiteTexId
+        }
 
         fun load(inputStream: InputStream): GlbModel {
             val bytes = inputStream.readBytes()
@@ -266,7 +298,11 @@ class GlbModel(
                     var glowTex = 0
 
                     val pbr = mObj.optJSONObject("pbrMetallicRoughness")
-                    val baseColorTexObj = pbr?.optJSONObject("baseColorTexture")
+                    var baseColorTexObj = pbr?.optJSONObject("baseColorTexture")
+                    if (baseColorTexObj == null) {
+                        val specGloss = mObj.optJSONObject("extensions")?.optJSONObject("KHR_materials_pbrSpecularGlossiness")
+                        baseColorTexObj = specGloss?.optJSONObject("diffuseTexture")
+                    }
                     val baseTexIdx = baseColorTexObj?.optInt("index", -1) ?: -1
                     if (baseTexIdx >= 0) {
                         val imgIdx = textureSourceMap[baseTexIdx] ?: baseTexIdx
@@ -290,6 +326,7 @@ class GlbModel(
             if (meshesJson != null) {
                 for (mIdx in 0 until meshesJson.length()) {
                     val meshObj = meshesJson.getJSONObject(mIdx)
+                    val meshName = meshObj.optString("name", "Mesh_$mIdx")
                     val primsArr = meshObj.getJSONArray("primitives")
                     for (pIdx in 0 until primsArr.length()) {
                         val prim = primsArr.getJSONObject(pIdx)
@@ -301,6 +338,16 @@ class GlbModel(
                         val jointsAccIdx = attributes.optInt("JOINTS_0", -1)
                         val weightsAccIdx = attributes.optInt("WEIGHTS_0", -1)
                         val indicesAccIdx = prim.optInt("indices", -1)
+
+                        val posAccObj = accessorsJson.optJSONObject(posAccIdx)
+                        val minArr = posAccObj?.optJSONArray("min")
+                        val maxArr = posAccObj?.optJSONArray("max")
+                        val minX = minArr?.optDouble(0, 0.0)?.toFloat() ?: 0f
+                        val minY = minArr?.optDouble(1, 0.0)?.toFloat() ?: 0f
+                        val minZ = minArr?.optDouble(2, 0.0)?.toFloat() ?: 0f
+                        val maxX = maxArr?.optDouble(0, 0.0)?.toFloat() ?: 0f
+                        val maxY = maxArr?.optDouble(1, 0.0)?.toFloat() ?: 0f
+                        val maxZ = maxArr?.optDouble(2, 0.0)?.toFloat() ?: 0f
 
                         val posData = readFloatArray(posAccIdx, 3)
                         val normData = if (normAccIdx >= 0) readFloatArray(normAccIdx, 3) else FloatArray(posData.size) { 0f }
@@ -341,7 +388,11 @@ class GlbModel(
 
                         val matIdx = prim.optInt("material", -1)
                         val matTex = if (matIdx >= 0) materialTexMap[matIdx] else null
-                        val primDiffTex = matTex?.diffuseTexId ?: (allLoadedTextures.firstOrNull() ?: 0)
+                        val primDiffTex = when {
+                            matTex != null && matTex.diffuseTexId != 0 -> matTex.diffuseTexId
+                            allLoadedTextures.isNotEmpty() -> allLoadedTextures.first()
+                            else -> getDefaultWhiteTexture()
+                        }
                         val primGlowTex = matTex?.glowTexId ?: 0
 
                         primitivesList.add(
@@ -350,7 +401,14 @@ class GlbModel(
                                 indexCount = indicesData.size,
                                 diffuseTexId = primDiffTex,
                                 glowTexId = primGlowTex,
-                                vboIds = vbo
+                                vboIds = vbo,
+                                name = meshName,
+                                minX = minX,
+                                minY = minY,
+                                minZ = minZ,
+                                maxX = maxX,
+                                maxY = maxY,
+                                maxZ = maxZ
                             )
                         )
                     }

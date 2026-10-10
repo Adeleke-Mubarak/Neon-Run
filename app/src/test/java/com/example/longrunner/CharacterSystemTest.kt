@@ -33,10 +33,10 @@ class CharacterSystemTest {
 
     @Test
     fun testRosterDataCompletenessAndUniqueness() {
-        assertEquals(5, CharacterData.ALL.size)
+        assertEquals(6, CharacterData.ALL.size)
 
         val ids = CharacterData.ALL.map { it.id }.toSet()
-        assertEquals(5, ids.size)
+        assertEquals(6, ids.size)
 
         // Verify Kai
         val kai = CharacterData.KAI
@@ -45,6 +45,12 @@ class CharacterSystemTest {
         assertEquals(SilhouetteType.BALANCED, kai.silhouetteType)
         assertEquals(0, kai.unlockCostCredits)
         assertEquals("models/runner.glb", kai.modelAssetPath)
+
+        // Verify Jake
+        val jake = CharacterData.JAKE
+        assertEquals("Jake", jake.name)
+        assertEquals("models/character_endless_runner.glb", jake.modelAssetPath)
+        assertEquals(0, jake.unlockCostCredits)
 
         // Verify Zara
         val zara = CharacterData.ZARA

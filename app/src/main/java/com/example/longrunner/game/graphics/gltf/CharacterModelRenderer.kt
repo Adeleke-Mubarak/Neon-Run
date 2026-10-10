@@ -92,10 +92,18 @@ class CharacterModelRenderer(context: Context, modelAssetPath: String = "models/
         modelMatrix.identity()
         // Position character: y is track surface (mocap skeleton drops to ground during slide naturally)
         modelMatrix.translate(x, y, z)
-        // Mixamo character faces +Z by default; rotate 180 degrees around Y to face down -Z highway
-        modelMatrix.rotate(180f, 0f, 1f, 0f)
-        // Natural human scale
-        modelMatrix.scale(1.0f, 1.0f, 1.0f)
+        val isToonModel = currentAssetPath?.contains("character_endless_runner") == true
+        if (isToonModel) {
+            // Sketchfab OBJ to GLB conversion: Z-up to Y-up rotation and scale from cm to meters
+            modelMatrix.rotate(-90f, 1f, 0f, 0f)
+            modelMatrix.rotate(180f, 0f, 0f, 1f)
+            modelMatrix.scale(0.0105f, 0.0105f, 0.0105f)
+        } else {
+            // Mixamo character faces +Z by default; rotate 180 degrees around Y to face down -Z highway
+            modelMatrix.rotate(180f, 0f, 1f, 0f)
+            // Natural human scale
+            modelMatrix.scale(1.0f, 1.0f, 1.0f)
+        }
 
         Matrix4.multiply(mvpMatrix, vpMatrix, modelMatrix)
 
