@@ -115,8 +115,7 @@ class WorldEventManager(private val random: Random = Random.Default) {
         if (!isEventActive && !isWarningActive && distance >= nextEventDistance - 50.0f) {
             // Pick next random event (rotate through DRONE_SWARM, REALITY_FRACTURE)
             val events = listOf(
-                WorldEventType.DRONE_SWARM,
-                WorldEventType.REALITY_FRACTURE
+                WorldEventType.DRONE_SWARM
             )
             pendingEvent = events[random.nextInt(events.size)]
             isWarningActive = true

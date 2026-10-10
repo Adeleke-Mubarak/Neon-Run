@@ -210,120 +210,6 @@ fun GameHUD(
                     }
                 }
 
-                // Phase Reality Floating Watermark Banner
-                AnimatedVisibility(
-                    visible = stats.isPhaseShiftActive,
-                    enter = fadeIn(),
-                    exit = fadeOut(),
-                    modifier = Modifier.align(Alignment.CenterHorizontally).padding(top = 6.dp)
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .background(
-                                Brush.horizontalGradient(listOf(NeonViolet.copy(alpha = 0.45f), NeonMagenta.copy(alpha = 0.45f))),
-                                shape = RoundedCornerShape(8.dp)
-                            )
-                            .border(1.dp, NeonViolet, RoundedCornerShape(8.dp))
-                            .padding(horizontal = 14.dp, vertical = 4.dp)
-                    ) {
-                        Text(
-                            text = "🌀 PHASE REALITY // ETHEREAL PASS",
-                            color = Color.White,
-                            fontSize = 11.sp,
-                            fontWeight = FontWeight.Black,
-                            fontFamily = FontFamily.Monospace
-                        )
-                    }
-                }
-
-                // Route Fracture Imminent Warning
-                AnimatedVisibility(
-                    visible = stats.isFractureWarning,
-                    enter = fadeIn(),
-                    exit = fadeOut(),
-                    modifier = Modifier.align(Alignment.CenterHorizontally).padding(top = 6.dp)
-                ) {
-                    Column(
-                        modifier = Modifier
-                            .background(
-                                Brush.horizontalGradient(listOf(Color(0xDDE65100), Color(0xDDFF8F00))),
-                                shape = RoundedCornerShape(8.dp)
-                            )
-                            .border(1.5.dp, NeonGold, RoundedCornerShape(8.dp))
-                            .padding(horizontal = 14.dp, vertical = 6.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Text(
-                            text = "⚠️ " + stats.fractureWarningTitle,
-                            color = Color.White,
-                            fontSize = 11.sp,
-                            fontWeight = FontWeight.Black,
-                            fontFamily = FontFamily.Monospace,
-                            letterSpacing = 0.5.sp
-                        )
-                        if (stats.fractureWarningSubtitle.isNotEmpty()) {
-                            Text(
-                                text = stats.fractureWarningSubtitle,
-                                color = NeonGold,
-                                fontSize = 9.5.sp,
-                                fontWeight = FontWeight.Bold,
-                                fontFamily = FontFamily.Monospace
-                            )
-                        }
-                    }
-                }
-
-                // Active Fracture Route Indicator
-                AnimatedVisibility(
-                    visible = stats.isInFractureZone && stats.activeRouteName.isNotEmpty(),
-                    enter = fadeIn(),
-                    exit = fadeOut(),
-                    modifier = Modifier.align(Alignment.CenterHorizontally).padding(top = 6.dp)
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .background(
-                                Brush.horizontalGradient(listOf(Color(0xCC004D40), Color(0xCC00B4D8))),
-                                shape = RoundedCornerShape(8.dp)
-                            )
-                            .border(1.dp, NeonCyan, RoundedCornerShape(8.dp))
-                            .padding(horizontal = 12.dp, vertical = 4.dp)
-                    ) {
-                        Text(
-                            text = "⚡ " + stats.activeRouteName,
-                            color = Color.White,
-                            fontSize = 10.5.sp,
-                            fontWeight = FontWeight.Black,
-                            fontFamily = FontFamily.Monospace
-                        )
-                    }
-                }
-
-                // Fracture Cleared Triumphant Banner
-                AnimatedVisibility(
-                    visible = stats.fractureClearMessage.isNotEmpty(),
-                    enter = fadeIn(),
-                    exit = fadeOut(),
-                    modifier = Modifier.align(Alignment.CenterHorizontally).padding(top = 6.dp)
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .background(
-                                Brush.horizontalGradient(listOf(Color(0xDD1B5E20), Color(0xDD00C853))),
-                                shape = RoundedCornerShape(8.dp)
-                            )
-                            .border(1.5.dp, Color(0xFF69F0AE), RoundedCornerShape(8.dp))
-                            .padding(horizontal = 14.dp, vertical = 5.dp)
-                    ) {
-                        Text(
-                            text = stats.fractureClearMessage,
-                            color = Color.White,
-                            fontSize = 11.5.sp,
-                            fontWeight = FontWeight.Black,
-                            fontFamily = FontFamily.Monospace
-                        )
-                    }
-                }
 
                 // World Event Imminent Warning Banner
                 AnimatedVisibility(
@@ -346,16 +232,6 @@ fun GameHUD(
                 }
             }
 
-            // Phase Shift Action Button (Bottom-Left)
-            if (stats.state == GameState.RUNNING) {
-                PhaseShiftButton(
-                    stats = stats,
-                    onClick = onTogglePhaseShift,
-                    modifier = Modifier
-                        .align(Alignment.BottomStart)
-                        .padding(bottom = 36.dp, start = 18.dp)
-                )
-            }
 
             // Hoverboard Deployment Action Button (Bottom-Right, above Ability Button)
             if (stats.state == GameState.RUNNING) {
@@ -1028,11 +904,11 @@ fun StartOverlay(
                 textAlign = TextAlign.Center
             )
             Text(
-                text = "FRACTURE",
-                color = NeonMagenta,
-                fontSize = 24.sp,
+                text = "SUBWAY RUNNER",
+                color = NeonGold,
+                fontSize = 22.sp,
                 fontWeight = FontWeight.Bold,
-                letterSpacing = 6.sp,
+                letterSpacing = 4.sp,
                 fontFamily = FontFamily.Monospace,
                 textAlign = TextAlign.Center
             )

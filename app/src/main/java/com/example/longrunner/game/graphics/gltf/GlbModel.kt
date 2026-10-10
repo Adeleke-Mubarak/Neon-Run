@@ -152,7 +152,9 @@ class GlbModel(
 
             // Helper to get buffer slice
             fun getBufferSlice(byteOffset: Int, byteLength: Int): ByteBuffer {
-                val slice = ByteBuffer.wrap(bytes, binOffset + byteOffset, byteLength).order(ByteOrder.LITTLE_ENDIAN)
+                val start = (binOffset + byteOffset).coerceIn(0, bytes.size)
+                val clampedLen = byteLength.coerceIn(0, bytes.size - start)
+                val slice = ByteBuffer.wrap(bytes, start, clampedLen).slice().order(ByteOrder.LITTLE_ENDIAN)
                 return slice
             }
 
@@ -192,8 +194,9 @@ class GlbModel(
             fun readFloatArray(accessorIndex: Int, componentsPerItem: Int): FloatArray {
                 val acc = accessorsList[accessorIndex]
                 val bv = bufferViewsList[acc.bufferViewIndex]
-                val buf = getBufferSlice(bv.byteOffset + acc.byteOffset, bv.byteLength)
                 val totalFloats = acc.count * componentsPerItem
+                val byteLen = totalFloats * 4
+                val buf = getBufferSlice(bv.byteOffset + acc.byteOffset, byteLen)
                 val out = FloatArray(totalFloats)
                 buf.asFloatBuffer().get(out)
                 return out
@@ -203,7 +206,13 @@ class GlbModel(
             fun readShortArray(accessorIndex: Int): ShortArray {
                 val acc = accessorsList[accessorIndex]
                 val bv = bufferViewsList[acc.bufferViewIndex]
-                val buf = getBufferSlice(bv.byteOffset + acc.byteOffset, bv.byteLength)
+                val bytesPerComponent = when (acc.componentType) {
+                    5125 -> 4
+                    5123 -> 2
+                    else -> 1
+                }
+                val byteLen = acc.count * bytesPerComponent
+                val buf = getBufferSlice(bv.byteOffset + acc.byteOffset, byteLen)
                 val out = ShortArray(acc.count)
                 if (acc.componentType == 5123) { // UNSIGNED_SHORT
                     buf.asShortBuffer().get(out)
@@ -214,7 +223,7 @@ class GlbModel(
                 } else if (acc.componentType == 5125) { // UNSIGNED_INT
                     val ib = buf.asIntBuffer()
                     for (i in 0 until acc.count) {
-                        out[i] = ib.get().toShort()
+                        out[i] = (ib.get() and 0xFFFF).toShort()
                     }
                 }
                 return out
@@ -224,7 +233,9 @@ class GlbModel(
             fun readJointsFloatArray(accessorIndex: Int): FloatArray {
                 val acc = accessorsList[accessorIndex]
                 val bv = bufferViewsList[acc.bufferViewIndex]
-                val buf = getBufferSlice(bv.byteOffset + acc.byteOffset, bv.byteLength)
+                val bytesPerComponent = if (acc.componentType == 5123) 2 else 1
+                val byteLen = acc.count * 4 * bytesPerComponent
+                val buf = getBufferSlice(bv.byteOffset + acc.byteOffset, byteLen)
                 val out = FloatArray(acc.count * 4)
 
                 if (acc.componentType == 5121) { // UNSIGNED_BYTE

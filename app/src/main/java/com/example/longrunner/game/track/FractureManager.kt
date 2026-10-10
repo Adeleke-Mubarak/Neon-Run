@@ -46,7 +46,7 @@ data class FractureEvent(
  * Fractures trigger at controlled distance intervals, altering track topology,
  * lane hazards, vertical elevation, and risk-reward branching.
  */
-class FractureManager {
+class FractureManager(var isEnabled: Boolean = true) {
 
     private val scheduledFractures = ArrayList<FractureEvent>()
     private var nextFractureDistance: Float = 220.0f
@@ -146,6 +146,7 @@ class FractureManager {
     }
 
     fun getUpcomingFractureForDistance(distanceMeters: Float): FractureEvent? {
+        if (!isEnabled) return null
         val targetZ = -distanceMeters
         return scheduledFractures.firstOrNull { it.startZ <= targetZ && it.startZ > targetZ - 120.0f }
     }
@@ -154,6 +155,15 @@ class FractureManager {
      * Updates fracture detection, warning states, and completion evaluations.
      */
     fun update(playerZ: Float, playerLane: Int, dt: Float) {
+        if (!isEnabled) {
+            isWarningActive = false
+            isInFractureZone = false
+            currentFracture = null
+            warningTitle = ""
+            warningSubtitle = ""
+            activeRouteName = ""
+            return
+        }
         // Banner countdown
         if (clearBannerTimer > 0f) {
             clearBannerTimer -= dt

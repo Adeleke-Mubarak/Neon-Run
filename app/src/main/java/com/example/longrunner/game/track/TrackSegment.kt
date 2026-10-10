@@ -154,85 +154,34 @@ class TrackSegment(val segmentIndex: Int) {
         shader.setModelMatrix(modelMatrix.values)
         shader.setMVPMatrix(mvpMatrix.values)
 
-        // Select road geometry based on elevation profile or dynamic biome type
-        when (type) {
-            SegmentType.FRACTURE_OVERPASS_RAMP_UP -> rampUpRoadMesh.render(shader)
-            SegmentType.FRACTURE_OVERPASS -> elevatedRoadMesh.render(shader)
-            SegmentType.FRACTURE_OVERPASS_RAMP_DOWN -> rampDownRoadMesh.render(shader)
-            else -> {
-                if (subwayEnvRenderer != null && subwayEnvRenderer.isLoaded && biomeType == BiomeType.CITY_STREETS) {
-                    subwayEnvRenderer.renderTrack(vpMatrix, startZ, length)
-                    shader.bind()
-                } else {
-                    when (biomeType) {
-                        BiomeType.CITY_STREETS -> subwayRoadMesh.render(shader)
-                        BiomeType.DESERT_CANYON -> canyonRoadMesh.render(shader)
-                        BiomeType.OVERGROWN_RUINS -> ruinsRoadMesh.render(shader)
-                        BiomeType.ORBITAL_SKYDECK -> orbitalRoadMesh.render(shader)
-                    }
-                }
+        // Select road geometry
+        if (subwayEnvRenderer != null && subwayEnvRenderer.isLoaded) {
+            subwayEnvRenderer.renderTrack(vpMatrix, startZ, length)
+            subwayEnvRenderer.renderScenery(vpMatrix, startZ)
+            if (type == SegmentType.SKY_BRIDGE || type == SegmentType.OVERPASS_GANTRY ||
+                type == SegmentType.NEON_TUNNEL || type == SegmentType.SOLAR_DISTRICT) {
+                subwayEnvRenderer.renderBridge(vpMatrix, startZ)
             }
-        }
+            shader.bind()
+        } else {
+            when (type) {
+                SegmentType.FRACTURE_OVERPASS_RAMP_UP -> rampUpRoadMesh.render(shader)
+                SegmentType.FRACTURE_OVERPASS -> elevatedRoadMesh.render(shader)
+                SegmentType.FRACTURE_OVERPASS_RAMP_DOWN -> rampDownRoadMesh.render(shader)
+                else -> subwayRoadMesh.render(shader)
+            }
 
-        // Render modular scenery decor based on biome and segment type
-        val renderSceneryBuildings = performanceProfile.enableBackgroundScenery
-        when (type) {
-            SegmentType.METRO_STRAIGHT,
-            SegmentType.FRACTURE_MERGE,
-            SegmentType.FRACTURE_SPLIT -> {
-                if (renderSceneryBuildings) {
-                    if (subwayEnvRenderer != null && subwayEnvRenderer.isLoaded && biomeType == BiomeType.CITY_STREETS) {
-                        subwayEnvRenderer.renderScenery(vpMatrix, startZ)
-                        shader.bind()
-                    } else {
-                        when (biomeType) {
-                            BiomeType.CITY_STREETS -> subwaySceneryMesh.render(shader)
-                            BiomeType.DESERT_CANYON -> canyonSceneryMesh.render(shader)
-                            BiomeType.OVERGROWN_RUINS -> ruinsSceneryMesh.render(shader)
-                            BiomeType.ORBITAL_SKYDECK -> orbitalSceneryMesh.render(shader)
-                        }
-                    }
-                }
+            val renderSceneryBuildings = performanceProfile.enableBackgroundScenery
+            if (renderSceneryBuildings) {
+                subwaySceneryMesh.render(shader)
             }
-            SegmentType.NEON_TUNNEL -> {
-                if (subwayEnvRenderer != null && subwayEnvRenderer.isLoaded && biomeType == BiomeType.CITY_STREETS) {
-                    subwayEnvRenderer.renderBridge(vpMatrix, startZ)
-                    subwayEnvRenderer.renderScenery(vpMatrix, startZ)
-                    shader.bind()
-                } else {
-                    tunnelMesh.render(shader)
-                }
-            }
-            SegmentType.SKY_BRIDGE,
-            SegmentType.OVERPASS_GANTRY,
-            SegmentType.SOLAR_DISTRICT -> {
-                if (subwayEnvRenderer != null && subwayEnvRenderer.isLoaded && biomeType == BiomeType.CITY_STREETS) {
-                    subwayEnvRenderer.renderBridge(vpMatrix, startZ)
-                    if (renderSceneryBuildings) {
-                        subwayEnvRenderer.renderScenery(vpMatrix, startZ)
-                    }
-                    shader.bind()
-                } else {
-                    if (type == SegmentType.SKY_BRIDGE) {
-                        bridgeMesh.render(shader)
-                    } else if (type == SegmentType.SOLAR_DISTRICT) {
-                        solarCanopyMesh.render(shader)
-                    } else {
-                        if (renderSceneryBuildings) subwaySceneryMesh.render(shader)
-                        gantryMesh.render(shader)
-                    }
-                }
-            }
-            SegmentType.FRACTURE_OVERPASS_RAMP_UP,
-            SegmentType.FRACTURE_OVERPASS,
-            SegmentType.FRACTURE_OVERPASS_RAMP_DOWN -> {
+            if (type == SegmentType.SKY_BRIDGE || type == SegmentType.FRACTURE_OVERPASS) {
                 bridgeMesh.render(shader)
+            } else if (type == SegmentType.OVERPASS_GANTRY) {
+                gantryMesh.render(shader)
+            } else if (type == SegmentType.NEON_TUNNEL) {
+                tunnelMesh.render(shader)
             }
-        }
-
-        // Render transition gateway portal at zone boundary thresholds
-        if (isTransitionGateway) {
-            transitGatewayMesh.render(shader)
         }
 
         // Render segment obstacles with distance culling

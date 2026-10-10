@@ -17,7 +17,7 @@ import kotlin.math.abs
 class TrackGenerator(
     val random: Random = Random(),
     val validationSystem: ObstacleValidationSystem = ObstacleValidationSystem(),
-    val fractureManager: FractureManager = FractureManager(),
+    val fractureManager: FractureManager = FractureManager(isEnabled = false),
     val biomeManager: BiomeManager = BiomeManager()
 ) {
 

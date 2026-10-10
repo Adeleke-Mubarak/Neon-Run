@@ -153,7 +153,8 @@ class Obstacle(
                     return
                 }
                 ObstacleType.HIGH_BEAM,
-                ObstacleType.FALLING_DEBRIS -> {
+                ObstacleType.FALLING_DEBRIS,
+                ObstacleType.PATROL_DRONE -> {
                     subwayEnvRenderer.renderHurdle(vpMatrix, currentX, currentY + 1.25f, z, scaleMultiplier = 0.50f)
                     shader.bind()
                     return

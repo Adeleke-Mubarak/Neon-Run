@@ -193,7 +193,11 @@ class Renderer3D(
 
         val phaseTransition = engine.phaseEnergyManager.phaseFrequencyTransition
         val playerDistance = engine.scoreManager.distance
-        val atmosphere = engine.biomeManager.getInterpolatedAtmosphere(playerDistance)
+        val atmosphere = if (subwayEnvRenderer?.isLoaded == true) {
+            com.example.longrunner.game.world.biomes.BiomeData.CITY_STREETS.atmosphere
+        } else {
+            engine.biomeManager.getInterpolatedAtmosphere(playerDistance)
+        }
 
         // Clear screen with dynamic dual-reality palette modulated by interpolated biome atmosphere
         val clearR = (atmosphere.clearR + (0.10f - atmosphere.clearR) * phaseTransition).coerceIn(0f, 1f)
