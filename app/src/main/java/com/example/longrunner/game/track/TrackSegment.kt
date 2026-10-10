@@ -160,18 +160,16 @@ class TrackSegment(val segmentIndex: Int) {
             SegmentType.FRACTURE_OVERPASS -> elevatedRoadMesh.render(shader)
             SegmentType.FRACTURE_OVERPASS_RAMP_DOWN -> rampDownRoadMesh.render(shader)
             else -> {
-                when (biomeType) {
-                    BiomeType.CITY_STREETS -> {
-                        if (subwayEnvRenderer != null && subwayEnvRenderer.isLoaded) {
-                            subwayEnvRenderer.renderTrack(vpMatrix, startZ, length)
-                            shader.bind()
-                        } else {
-                            subwayRoadMesh.render(shader)
-                        }
+                if (subwayEnvRenderer != null && subwayEnvRenderer.isLoaded && biomeType == BiomeType.CITY_STREETS) {
+                    subwayEnvRenderer.renderTrack(vpMatrix, startZ, length)
+                    shader.bind()
+                } else {
+                    when (biomeType) {
+                        BiomeType.CITY_STREETS -> subwayRoadMesh.render(shader)
+                        BiomeType.DESERT_CANYON -> canyonRoadMesh.render(shader)
+                        BiomeType.OVERGROWN_RUINS -> ruinsRoadMesh.render(shader)
+                        BiomeType.ORBITAL_SKYDECK -> orbitalRoadMesh.render(shader)
                     }
-                    BiomeType.DESERT_CANYON -> canyonRoadMesh.render(shader)
-                    BiomeType.OVERGROWN_RUINS -> ruinsRoadMesh.render(shader)
-                    BiomeType.ORBITAL_SKYDECK -> orbitalRoadMesh.render(shader)
                 }
             }
         }
@@ -179,70 +177,49 @@ class TrackSegment(val segmentIndex: Int) {
         // Render modular scenery decor based on biome and segment type
         val renderSceneryBuildings = performanceProfile.enableBackgroundScenery
         when (type) {
-            SegmentType.METRO_STRAIGHT -> {
+            SegmentType.METRO_STRAIGHT,
+            SegmentType.FRACTURE_MERGE,
+            SegmentType.FRACTURE_SPLIT -> {
                 if (renderSceneryBuildings) {
-                    when (biomeType) {
-                        BiomeType.CITY_STREETS -> {
-                            if (subwayEnvRenderer != null && subwayEnvRenderer.isLoaded) {
-                                subwayEnvRenderer.renderScenery(vpMatrix, startZ)
-                                shader.bind()
-                            } else {
-                                subwaySceneryMesh.render(shader)
-                            }
+                    if (subwayEnvRenderer != null && subwayEnvRenderer.isLoaded && biomeType == BiomeType.CITY_STREETS) {
+                        subwayEnvRenderer.renderScenery(vpMatrix, startZ)
+                        shader.bind()
+                    } else {
+                        when (biomeType) {
+                            BiomeType.CITY_STREETS -> subwaySceneryMesh.render(shader)
+                            BiomeType.DESERT_CANYON -> canyonSceneryMesh.render(shader)
+                            BiomeType.OVERGROWN_RUINS -> ruinsSceneryMesh.render(shader)
+                            BiomeType.ORBITAL_SKYDECK -> orbitalSceneryMesh.render(shader)
                         }
-                        BiomeType.DESERT_CANYON -> canyonSceneryMesh.render(shader)
-                        BiomeType.OVERGROWN_RUINS -> ruinsSceneryMesh.render(shader)
-                        BiomeType.ORBITAL_SKYDECK -> orbitalSceneryMesh.render(shader)
                     }
                 }
             }
             SegmentType.NEON_TUNNEL -> {
-                tunnelMesh.render(shader)
-            }
-            SegmentType.SKY_BRIDGE -> {
-                if (subwayEnvRenderer != null && subwayEnvRenderer.isLoaded) {
+                if (subwayEnvRenderer != null && subwayEnvRenderer.isLoaded && biomeType == BiomeType.CITY_STREETS) {
                     subwayEnvRenderer.renderBridge(vpMatrix, startZ)
+                    subwayEnvRenderer.renderScenery(vpMatrix, startZ)
                     shader.bind()
                 } else {
-                    bridgeMesh.render(shader)
+                    tunnelMesh.render(shader)
                 }
             }
-            SegmentType.OVERPASS_GANTRY -> {
-                if (renderSceneryBuildings) {
-                    when (biomeType) {
-                        BiomeType.CITY_STREETS -> {
-                            if (subwayEnvRenderer != null && subwayEnvRenderer.isLoaded) {
-                                subwayEnvRenderer.renderScenery(vpMatrix, startZ)
-                                shader.bind()
-                            } else {
-                                subwaySceneryMesh.render(shader)
-                            }
-                        }
-                        BiomeType.DESERT_CANYON -> canyonSceneryMesh.render(shader)
-                        BiomeType.OVERGROWN_RUINS -> ruinsSceneryMesh.render(shader)
-                        BiomeType.ORBITAL_SKYDECK -> orbitalSceneryMesh.render(shader)
-                    }
-                }
-                gantryMesh.render(shader)
-            }
+            SegmentType.SKY_BRIDGE,
+            SegmentType.OVERPASS_GANTRY,
             SegmentType.SOLAR_DISTRICT -> {
-                solarCanopyMesh.render(shader)
-            }
-            SegmentType.FRACTURE_SPLIT -> {
-                fractureSplitDecorMesh.render(shader)
-                if (renderSceneryBuildings) {
-                    when (biomeType) {
-                        BiomeType.CITY_STREETS -> {
-                            if (subwayEnvRenderer != null && subwayEnvRenderer.isLoaded) {
-                                subwayEnvRenderer.renderScenery(vpMatrix, startZ)
-                                shader.bind()
-                            } else {
-                                subwaySceneryMesh.render(shader)
-                            }
-                        }
-                        BiomeType.DESERT_CANYON -> canyonSceneryMesh.render(shader)
-                        BiomeType.OVERGROWN_RUINS -> ruinsSceneryMesh.render(shader)
-                        BiomeType.ORBITAL_SKYDECK -> orbitalSceneryMesh.render(shader)
+                if (subwayEnvRenderer != null && subwayEnvRenderer.isLoaded && biomeType == BiomeType.CITY_STREETS) {
+                    subwayEnvRenderer.renderBridge(vpMatrix, startZ)
+                    if (renderSceneryBuildings) {
+                        subwayEnvRenderer.renderScenery(vpMatrix, startZ)
+                    }
+                    shader.bind()
+                } else {
+                    if (type == SegmentType.SKY_BRIDGE) {
+                        bridgeMesh.render(shader)
+                    } else if (type == SegmentType.SOLAR_DISTRICT) {
+                        solarCanopyMesh.render(shader)
+                    } else {
+                        if (renderSceneryBuildings) subwaySceneryMesh.render(shader)
+                        gantryMesh.render(shader)
                     }
                 }
             }
@@ -250,24 +227,6 @@ class TrackSegment(val segmentIndex: Int) {
             SegmentType.FRACTURE_OVERPASS,
             SegmentType.FRACTURE_OVERPASS_RAMP_DOWN -> {
                 bridgeMesh.render(shader)
-            }
-            SegmentType.FRACTURE_MERGE -> {
-                gantryMesh.render(shader)
-                if (renderSceneryBuildings) {
-                    when (biomeType) {
-                        BiomeType.CITY_STREETS -> {
-                            if (subwayEnvRenderer != null && subwayEnvRenderer.isLoaded) {
-                                subwayEnvRenderer.renderScenery(vpMatrix, startZ)
-                                shader.bind()
-                            } else {
-                                subwaySceneryMesh.render(shader)
-                            }
-                        }
-                        BiomeType.DESERT_CANYON -> canyonSceneryMesh.render(shader)
-                        BiomeType.OVERGROWN_RUINS -> ruinsSceneryMesh.render(shader)
-                        BiomeType.ORBITAL_SKYDECK -> orbitalSceneryMesh.render(shader)
-                    }
-                }
             }
         }
 

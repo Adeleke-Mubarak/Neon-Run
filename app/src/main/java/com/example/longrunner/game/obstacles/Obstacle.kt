@@ -140,17 +140,20 @@ class Obstacle(
 
         if (subwayEnvRenderer != null && subwayEnvRenderer.isLoaded) {
             when (type) {
-                ObstacleType.CYBER_BLOCK -> {
+                ObstacleType.CYBER_BLOCK,
+                ObstacleType.BREAKABLE_CRATE -> {
                     subwayEnvRenderer.renderTrain(vpMatrix, currentX, currentY, z)
                     shader.bind()
                     return
                 }
-                ObstacleType.LOW_HURDLE -> {
+                ObstacleType.LOW_HURDLE,
+                ObstacleType.SLIDING_GATE -> {
                     subwayEnvRenderer.renderHurdle(vpMatrix, currentX, currentY, z, scaleMultiplier = 0.40f)
                     shader.bind()
                     return
                 }
-                ObstacleType.HIGH_BEAM -> {
+                ObstacleType.HIGH_BEAM,
+                ObstacleType.FALLING_DEBRIS -> {
                     subwayEnvRenderer.renderHurdle(vpMatrix, currentX, currentY + 1.25f, z, scaleMultiplier = 0.50f)
                     shader.bind()
                     return

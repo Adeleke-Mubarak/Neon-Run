@@ -215,8 +215,8 @@ data class CharacterData(
             modelAssetPath = "models/character_endless_runner.glb"
         )
 
-        val ALL = listOf(KAI, JAKE, ZARA, JAX, NOVA, MIRA)
+        val ALL = listOf(JAKE, KAI, ZARA, JAX, NOVA, MIRA)
 
-        fun findById(id: String): CharacterData = ALL.find { it.id == id } ?: KAI
+        fun findById(id: String): CharacterData = ALL.find { it.id == id } ?: JAKE
     }
 }

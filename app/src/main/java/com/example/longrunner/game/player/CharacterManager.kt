@@ -13,11 +13,12 @@ class CharacterManager(context: Context? = null) {
     private val prefs: SharedPreferences? = context?.getSharedPreferences("neon_run_characters", Context.MODE_PRIVATE)
     private val bankPrefs: SharedPreferences? = context?.getSharedPreferences("neon_run_save", Context.MODE_PRIVATE)
 
-    var selectedCharacterId: String = prefs?.getString("selected_character_id", CharacterData.KAI.id) ?: CharacterData.KAI.id
+    var selectedCharacterId: String = prefs?.getString("selected_character_id", CharacterData.JAKE.id) ?: CharacterData.JAKE.id
         private set
 
     private val unlockedCharacterIds = HashSet<String>().apply {
-        add(CharacterData.KAI.id) // Kai is unlocked by default
+        add(CharacterData.KAI.id)
+        add(CharacterData.JAKE.id)
         prefs?.getStringSet("unlocked_character_ids", null)?.let {
             addAll(it)
         }
@@ -33,7 +34,7 @@ class CharacterManager(context: Context? = null) {
     }
 
     fun isUnlocked(characterId: String): Boolean {
-        if (characterId == CharacterData.KAI.id) return true
+        if (characterId == CharacterData.KAI.id || characterId == CharacterData.JAKE.id) return true
         return unlockedCharacterIds.contains(characterId)
     }
 

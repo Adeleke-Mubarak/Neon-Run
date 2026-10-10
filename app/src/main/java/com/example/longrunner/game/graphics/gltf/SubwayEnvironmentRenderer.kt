@@ -108,13 +108,11 @@ class SubwayEnvironmentRenderer(context: Context, modelAssetPath: String = "mode
     fun renderTrack(vpMatrix: Matrix4, startZ: Float, segmentLength: Float = 40.0f) {
         val activeModel = model ?: return
         val activeShader = shader ?: return
-        if (trackPrimitives.isEmpty()) return
-
-        val prim = trackPrimitives.first()
+        val prim = trackPrimitives.firstOrNull() ?: return
 
         // Center and length scaling
         // Raw Track: length dx=4222.2, width dy=2807.2, height dz=1333.6
-        // Raw center: cx = -3414.6f, cy = -1229.2f, cz_base = 120.0f
+        // Raw center: cx = -3414.6f, cy = -1229.2f, czBase = 120.0f
         val cx = -3414.6f
         val cy = -1229.2f
         val czBase = 120.0f
@@ -122,37 +120,46 @@ class SubwayEnvironmentRenderer(context: Context, modelAssetPath: String = "mode
         val scaleLen = segmentLength / 4222.2f
         val scaleWidth = 0.0095f
         val scaleHeight = 0.0095f
+        val centerZ = startZ - segmentLength * 0.5f
 
-        modelMatrix.identity()
-        modelMatrix.translate(0f, 0f, startZ - segmentLength * 0.5f)
-
-        // Custom matrix combining axis mapping and origin centering:
-        // x' = -(rawY - cy) * scaleWidth
-        // y' = (rawZ - czBase) * scaleHeight
-        // z' = -(rawX - cx) * scaleLen
+        // Standard column-major OpenGL transform:
+        // worldX = (rawY - cy) * scaleWidth
+        // worldY = (rawZ - czBase) * scaleHeight
+        // worldZ = -(rawX - cx) * scaleLen + centerZ
         val m = FloatArray(16)
-        // Col 0: raw X maps to -Z
+        // Col 0: raw X maps to -worldZ (length along track)
+        m[0] = 0f
+        m[1] = 0f
         m[2] = -scaleLen
-        // Col 1: raw Y maps to -X
-        m[0] = -scaleWidth
-        // Col 2: raw Z maps to +Y
-        m[5] = scaleHeight
+        m[3] = 0f
+
+        // Col 1: raw Y maps to +worldX (width across tracks)
+        m[4] = scaleWidth
+        m[5] = 0f
+        m[6] = 0f
+        m[7] = 0f
+
+        // Col 2: raw Z maps to +worldY (vertical rail elevation)
+        m[8] = 0f
+        m[9] = scaleHeight
+        m[10] = 0f
+        m[11] = 0f
+
         // Col 3: Translation with center offsets
-        m[12] = 0f + cy * scaleWidth
+        m[12] = 0f - cy * scaleWidth
         m[13] = 0f - czBase * scaleHeight
-        m[14] = (startZ - segmentLength * 0.5f) + cx * scaleLen
+        m[14] = centerZ + cx * scaleLen
         m[15] = 1.0f
 
         val customModelMatrix = Matrix4(m)
         Matrix4.multiply(mvpMatrix, vpMatrix, customModelMatrix)
 
+        android.opengl.GLES30.glDisable(android.opengl.GLES30.GL_CULL_FACE)
         activeShader.bind()
         activeShader.setModelMatrix(customModelMatrix.values)
         activeShader.setMVPMatrix(mvpMatrix.values)
 
-        for (p in trackPrimitives) {
-            activeModel.renderPrimitive(p, activeShader)
-        }
+        activeModel.renderPrimitive(prim, activeShader)
     }
 
     /**
@@ -170,15 +177,30 @@ class SubwayEnvironmentRenderer(context: Context, modelAssetPath: String = "mode
         val czBase = 119.3f
         val s = 0.010f // Centimeters to meters
 
+        // worldX = (rawY - cy) * s + laneX
+        // worldY = (rawZ - czBase) * s + y
+        // worldZ = -(rawX - cx) * s + z
         val m = FloatArray(16)
         // Col 0: raw X maps to -Z (train length along track)
+        m[0] = 0f
+        m[1] = 0f
         m[2] = -s
-        // Col 1: raw Y maps to -X (train width across lane)
-        m[0] = -s
+        m[3] = 0f
+
+        // Col 1: raw Y maps to +X (train width across lane)
+        m[4] = s
+        m[5] = 0f
+        m[6] = 0f
+        m[7] = 0f
+
         // Col 2: raw Z maps to +Y (train height)
-        m[5] = s
+        m[8] = 0f
+        m[9] = s
+        m[10] = 0f
+        m[11] = 0f
+
         // Col 3: World position + offset
-        m[12] = laneX + cy * s
+        m[12] = laneX - cy * s
         m[13] = y - czBase * s
         m[14] = z + cx * s
         m[15] = 1.0f
@@ -186,6 +208,7 @@ class SubwayEnvironmentRenderer(context: Context, modelAssetPath: String = "mode
         val customModelMatrix = Matrix4(m)
         Matrix4.multiply(mvpMatrix, vpMatrix, customModelMatrix)
 
+        android.opengl.GLES30.glDisable(android.opengl.GLES30.GL_CULL_FACE)
         activeShader.bind()
         activeShader.setModelMatrix(customModelMatrix.values)
         activeShader.setMVPMatrix(mvpMatrix.values)
@@ -202,21 +225,36 @@ class SubwayEnvironmentRenderer(context: Context, modelAssetPath: String = "mode
         val prim = hurdlePrimitives.firstOrNull() ?: return
 
         // Raw Hurdle: cx = -6374.9f, cy = -1268.2f, czBase = 121.4f
-        // dx = 616.2 (width), dy = 212.4 (depth), dz = 310.7 (height)
+        // dx = 616.2 (width across lane), dy = 212.4 (depth along track), dz = 310.7 (height)
         val cx = -6374.9f
         val cy = -1268.2f
         val czBase = 121.4f
 
-        // Scaled to fit 3-meter lane (width ~2.6m, height ~1.3m)
+        // Scaled to fit 3-meter lane (width ~2.7m, height ~1.4m)
         val s = 0.0045f * (scaleMultiplier / 0.45f)
 
+        // worldX = (rawX - cx) * s + laneX
+        // worldY = (rawZ - czBase) * s + y
+        // worldZ = -(rawY - cy) * s + z
         val m = FloatArray(16)
         // Col 0: raw X maps to +X (hurdle width across lane)
         m[0] = s
+        m[1] = 0f
+        m[2] = 0f
+        m[3] = 0f
+
         // Col 1: raw Y maps to -Z (hurdle depth along track)
-        m[10] = -s
+        m[4] = 0f
+        m[5] = 0f
+        m[6] = -s
+        m[7] = 0f
+
         // Col 2: raw Z maps to +Y (hurdle height)
-        m[5] = s
+        m[8] = 0f
+        m[9] = s
+        m[10] = 0f
+        m[11] = 0f
+
         // Col 3: World position + offset
         m[12] = laneX - cx * s
         m[13] = y - czBase * s
@@ -226,6 +264,7 @@ class SubwayEnvironmentRenderer(context: Context, modelAssetPath: String = "mode
         val customModelMatrix = Matrix4(m)
         Matrix4.multiply(mvpMatrix, vpMatrix, customModelMatrix)
 
+        android.opengl.GLES30.glDisable(android.opengl.GLES30.GL_CULL_FACE)
         activeShader.bind()
         activeShader.setModelMatrix(customModelMatrix.values)
         activeShader.setMVPMatrix(mvpMatrix.values)
@@ -247,10 +286,26 @@ class SubwayEnvironmentRenderer(context: Context, modelAssetPath: String = "mode
         val s = 0.009f
 
         val m = FloatArray(16)
+        // Col 0: raw X maps to -Z
+        m[0] = 0f
+        m[1] = 0f
         m[2] = -s
-        m[0] = -s
-        m[5] = s
-        m[12] = 0f + cy * s
+        m[3] = 0f
+
+        // Col 1: raw Y maps to +X
+        m[4] = s
+        m[5] = 0f
+        m[6] = 0f
+        m[7] = 0f
+
+        // Col 2: raw Z maps to +Y
+        m[8] = 0f
+        m[9] = s
+        m[10] = 0f
+        m[11] = 0f
+
+        // Col 3: World position + offset
+        m[12] = 0f - cy * s
         m[13] = 0f - czBase * s
         m[14] = z + cx * s
         m[15] = 1.0f
@@ -258,6 +313,7 @@ class SubwayEnvironmentRenderer(context: Context, modelAssetPath: String = "mode
         val customModelMatrix = Matrix4(m)
         Matrix4.multiply(mvpMatrix, vpMatrix, customModelMatrix)
 
+        android.opengl.GLES30.glDisable(android.opengl.GLES30.GL_CULL_FACE)
         activeShader.bind()
         activeShader.setModelMatrix(customModelMatrix.values)
         activeShader.setMVPMatrix(mvpMatrix.values)
@@ -279,10 +335,26 @@ class SubwayEnvironmentRenderer(context: Context, modelAssetPath: String = "mode
         val s = 0.008f
 
         val m = FloatArray(16)
+        // Col 0: raw X maps to -Z
+        m[0] = 0f
+        m[1] = 0f
         m[2] = -s
-        m[0] = -s
-        m[5] = s
-        m[12] = 0f + cy * s
+        m[3] = 0f
+
+        // Col 1: raw Y maps to +X
+        m[4] = s
+        m[5] = 0f
+        m[6] = 0f
+        m[7] = 0f
+
+        // Col 2: raw Z maps to +Y
+        m[8] = 0f
+        m[9] = s
+        m[10] = 0f
+        m[11] = 0f
+
+        // Col 3: World position + offset
+        m[12] = 0f - cy * s
         m[13] = 0f - czBase * s
         m[14] = z + cx * s
         m[15] = 1.0f
@@ -290,6 +362,7 @@ class SubwayEnvironmentRenderer(context: Context, modelAssetPath: String = "mode
         val customModelMatrix = Matrix4(m)
         Matrix4.multiply(mvpMatrix, vpMatrix, customModelMatrix)
 
+        android.opengl.GLES30.glDisable(android.opengl.GLES30.GL_CULL_FACE)
         activeShader.bind()
         activeShader.setModelMatrix(customModelMatrix.values)
         activeShader.setMVPMatrix(mvpMatrix.values)

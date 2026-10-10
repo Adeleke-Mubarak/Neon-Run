@@ -123,7 +123,8 @@ class CharacterModelRenderer(context: Context, modelAssetPath: String = "models/
         activeShader.setCameraPosition(cameraX, cameraY, cameraZ)
         activeShader.setPhaseFrequency(phaseTransition)
 
-        // Draw skinned mesh
+        // Draw character mesh
+        android.opengl.GLES30.glDisable(android.opengl.GLES30.GL_CULL_FACE)
         activeModel.render(activeShader, activeController.boneMatrices)
         return true
     }

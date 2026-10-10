@@ -27,7 +27,7 @@ class GameEngineIntegrationSimulationTest {
         assertEquals(0, engine.scoreManager.score)
         assertEquals(0f, engine.scoreManager.distance, 0.001f)
         assertEquals(1, engine.comboManager.currentCombo)
-        assertEquals(CharacterData.KAI.id, engine.player.characterData.id)
+        assertEquals(CharacterData.JAKE.id, engine.player.characterData.id)
         assertFalse(engine.musicManager.isPlaying)
     }
 

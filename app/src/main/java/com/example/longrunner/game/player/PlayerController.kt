@@ -5,7 +5,7 @@ import com.example.longrunner.game.graphics.AABB
 import kotlin.math.abs
 import kotlin.math.min
 
-class PlayerController(var characterData: CharacterData = CharacterData.KAI) {
+class PlayerController(var characterData: CharacterData = CharacterData.JAKE) {
 
     var x: Float = 0f
         private set
