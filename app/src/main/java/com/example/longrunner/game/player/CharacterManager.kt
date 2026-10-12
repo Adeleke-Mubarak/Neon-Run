@@ -13,12 +13,11 @@ class CharacterManager(context: Context? = null) {
     private val prefs: SharedPreferences? = context?.getSharedPreferences("neon_run_characters", Context.MODE_PRIVATE)
     private val bankPrefs: SharedPreferences? = context?.getSharedPreferences("neon_run_save", Context.MODE_PRIVATE)
 
-    var selectedCharacterId: String = prefs?.getString("selected_character_id", CharacterData.JAKE.id) ?: CharacterData.JAKE.id
+    var selectedCharacterId: String = prefs?.getString("selected_character_id", CharacterData.RUNNER.id) ?: CharacterData.RUNNER.id
         private set
 
     private val unlockedCharacterIds = HashSet<String>().apply {
-        add(CharacterData.KAI.id)
-        add(CharacterData.JAKE.id)
+        add(CharacterData.RUNNER.id)
         prefs?.getStringSet("unlocked_character_ids", null)?.let {
             addAll(it)
         }
@@ -34,7 +33,7 @@ class CharacterManager(context: Context? = null) {
     }
 
     fun isUnlocked(characterId: String): Boolean {
-        if (characterId == CharacterData.KAI.id || characterId == CharacterData.JAKE.id) return true
+        if (characterId == CharacterData.RUNNER.id) return true
         return unlockedCharacterIds.contains(characterId)
     }
 
@@ -110,8 +109,8 @@ class CharacterManager(context: Context? = null) {
 
     fun resetAll() {
         unlockedCharacterIds.clear()
-        unlockedCharacterIds.add(CharacterData.KAI.id)
-        selectedCharacterId = CharacterData.KAI.id
+        unlockedCharacterIds.add(CharacterData.RUNNER.id)
+        selectedCharacterId = CharacterData.RUNNER.id
         totalBankCredits = 0
         prefs?.edit()?.clear()?.apply()
         bankPrefs?.edit()?.clear()?.apply()

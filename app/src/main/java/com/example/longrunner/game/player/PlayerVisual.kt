@@ -12,7 +12,7 @@ import kotlin.math.sin
  * Procedural 3D Character Renderer with articulated skeletal hierarchy.
  * Supports distinct silhouettes and accessories for Kai, Zara, Jax, Nova, and Mira.
  */
-class PlayerVisual(initialData: CharacterData = CharacterData.JAKE) {
+class PlayerVisual(initialData: CharacterData = CharacterData.RUNNER) {
 
     var data: CharacterData = initialData
         private set

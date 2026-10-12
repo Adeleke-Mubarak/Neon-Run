@@ -138,7 +138,7 @@ class Renderer3D(
         playerVisual = PlayerVisual(engine.player.characterData)
         val ctx = engine.context
         if (ctx != null) {
-            val initialModelPath = engine.player.characterData.modelAssetPath ?: "models/runner.glb"
+            val initialModelPath = engine.player.characterData.modelAssetPath ?: "models/runner3.glb"
             try {
                 characterModelRenderer = com.example.longrunner.game.graphics.gltf.CharacterModelRenderer(ctx, initialModelPath)
             } catch (e: Exception) {
@@ -367,7 +367,7 @@ class Renderer3D(
         // Synchronize active hoverboard visual model & neon palette
         activePlayerVisual.updateEquippedHoverboard(engine.hoverboardManager.getEquippedHoverboard())
 
-        val targetModelPath = engine.player.characterData.modelAssetPath ?: "models/runner.glb"
+        val targetModelPath = engine.player.characterData.modelAssetPath ?: "models/runner3.glb"
         val modelRenderer = characterModelRenderer
         if (modelRenderer != null && modelRenderer.currentAssetPath != targetModelPath) {
             val ctx = engine.context

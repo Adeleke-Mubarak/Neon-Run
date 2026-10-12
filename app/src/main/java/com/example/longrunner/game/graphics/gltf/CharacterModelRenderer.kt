@@ -8,7 +8,7 @@ import com.example.longrunner.game.graphics.Matrix4
  * High-level realistic 3D character model renderer.
  * Coordinates GLB loading, skeletal animation state machines, and GPU skinning.
  */
-class CharacterModelRenderer(context: Context, modelAssetPath: String = "models/runner.glb") {
+class CharacterModelRenderer(context: Context, modelAssetPath: String = "models/runner3.glb") {
 
     private var model: GlbModel? = null
     private var controller: GlbAnimationController? = null
