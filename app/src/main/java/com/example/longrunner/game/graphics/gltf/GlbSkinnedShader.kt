@@ -76,10 +76,11 @@ class GlbSkinnedShader {
     }
 
     /**
-     * Uploads the 3x4 affine bone matrix palette (up to 68 bones * 3 rows = 204 vec4s).
+     * Uploads the 3x4 affine bone matrix palette (up to 72 bones * 3 rows = 216 vec4s).
      */
     fun setBones(boneVectors: FloatArray, count: Int) {
-        GLES30.glUniform4fv(uBonesLoc, count, boneVectors, 0)
+        val safeCount = count.coerceAtMost(MAX_BONE_VECTORS)
+        GLES30.glUniform4fv(uBonesLoc, safeCount, boneVectors, 0)
     }
 
     fun setTextures(diffuseTexId: Int, glowTexId: Int) {
@@ -140,6 +141,9 @@ class GlbSkinnedShader {
     }
 
     companion object {
+        const val MAX_BONES = 72
+        const val MAX_BONE_VECTORS = MAX_BONES * 3
+
         private const val VERTEX_SHADER_SRC = """#version 300 es
 layout(location = 0) in vec3 a_Position;
 layout(location = 1) in vec3 a_Normal;
@@ -149,13 +153,16 @@ layout(location = 4) in vec4 a_Weights;
 
 uniform mat4 u_MVPMatrix;
 uniform mat4 u_ModelMatrix;
-uniform vec4 u_Bones[204]; // 68 bones * 3 rows (3x4 affine matrices)
+uniform vec4 u_Bones[216]; // 72 bones * 3 rows (3x4 affine matrices)
 
 out vec3 v_Position;
 out vec3 v_Normal;
 out vec2 v_TexCoord;
 
 mat4 getBoneMatrix(int boneIndex) {
+    if (boneIndex < 0 || boneIndex >= 72) {
+        return mat4(1.0); // Safety fallback: identity matrix prevents vertex dragging or collapse
+    }
     int idx = boneIndex * 3;
     vec4 r0 = u_Bones[idx];
     vec4 r1 = u_Bones[idx + 1];
