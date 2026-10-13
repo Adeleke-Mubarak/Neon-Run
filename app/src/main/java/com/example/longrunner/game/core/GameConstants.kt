@@ -24,8 +24,8 @@ object GameConstants {
     const val LANE_SWITCH_SPEED = 15.0f // horizontal lerp speed
 
     // Jump & Slide physics
-    const val JUMP_VELOCITY = 11.5f
-    const val GRAVITY = -28.0f
+    const val JUMP_VELOCITY = 13.2f
+    const val GRAVITY = -48.0f
     const val SLIDE_DURATION = 0.75f // seconds
     const val GROUND_Y = 0.0f
 

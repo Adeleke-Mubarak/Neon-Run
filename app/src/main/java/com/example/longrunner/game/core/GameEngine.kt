@@ -63,6 +63,8 @@ class GameEngine(val context: Context? = null) {
         private set
     var currentFrameTimeMs: Float = 16.6f
         private set
+    var currentTimeDilation: Float = 1.0f
+        private set
 
     fun updateTelemetry(fps: Int, frameTimeMs: Float) {
         currentFps = fps
@@ -242,6 +244,7 @@ class GameEngine(val context: Context? = null) {
         scoreManager.reset()
         comboManager.reset()
         nearMissTracker.reset()
+        currentTimeDilation = 1.0f
         phaseEnergyManager.reset()
         powerUpManager.resetRun()
         worldEventManager.reset()
@@ -393,6 +396,7 @@ class GameEngine(val context: Context? = null) {
             nearMissTracker.isSlowMotionActive -> 0.65f
             else -> 1.0f
         }
+        currentTimeDilation = timeDilation
         val effectiveDt = dt * timeDilation
 
         // Freeze combo timer during Mira's Time Slip
@@ -416,8 +420,9 @@ class GameEngine(val context: Context? = null) {
             soundManager.playPhaseShiftExit()
         }
 
-        // Update player kinematics
-        player.update(effectiveDt)
+        // Update player kinematics: forward progression & lane shifts follow effectiveDt,
+        // while vertical jump physics preserves un-dilated real frame dt so the player never floats suspended
+        player.update(effectiveDt, verticalDt = dt)
 
         // Update procedural track
         trackGenerator.update(player, effectiveDt)

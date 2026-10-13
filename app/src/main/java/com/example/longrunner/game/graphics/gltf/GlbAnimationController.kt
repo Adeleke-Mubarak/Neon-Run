@@ -8,6 +8,8 @@ class GlbAnimationController(private val model: GlbModel) {
     private var currentAnim: GlbAnimation? = null
     var currentTime: Float = 0f
         private set
+    val currentAnimationDuration: Float get() = currentAnim?.duration ?: 0f
+    val isFinished: Boolean get() = !isLooping && currentAnim != null && currentTime >= (currentAnim?.duration ?: 0f)
     var isLooping: Boolean = true
     var speedMultiplier: Float = 1.0f
 
@@ -157,9 +159,23 @@ class GlbAnimationController(private val model: GlbModel) {
                         val v1y = sampler.values[k1 * 3 + 1]
                         val v1z = sampler.values[k1 * 3 + 2]
 
-                        nodeTranslations[nodeIdx][0] = v0x + (v1x - v0x) * factor
-                        nodeTranslations[nodeIdx][1] = v0y + (v1y - v0y) * factor
-                        nodeTranslations[nodeIdx][2] = v0z + (v1z - v0z) * factor
+                        var tx = v0x + (v1x - v0x) * factor
+                        var ty = v0y + (v1y - v0y) * factor
+                        var tz = v0z + (v1z - v0z) * factor
+
+                        // Dampen vertical root motion on Hips bone during Jump:
+                        // runner3.glb's Hips contains +0.99m vertical translation along local Z.
+                        // Physical vertical elevation is driven by GameEngine (1.81m arc).
+                        // Dampening excess root displacement prevents floating high above the ground.
+                        if (anim.name == "Jump" && model.nodes[nodeIdx].name == "mixamorig:Hips") {
+                            val baselineZ = -73.44f
+                            val excessZ = tz - baselineZ
+                            tz = baselineZ + excessZ * 0.25f
+                        }
+
+                        nodeTranslations[nodeIdx][0] = tx
+                        nodeTranslations[nodeIdx][1] = ty
+                        nodeTranslations[nodeIdx][2] = tz
                     }
                     "rotation" -> {
                         val q0 = Quaternion(

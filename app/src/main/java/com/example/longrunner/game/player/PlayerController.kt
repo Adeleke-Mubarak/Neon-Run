@@ -34,6 +34,8 @@ class PlayerController(var characterData: CharacterData = CharacterData.RUNNER) 
         private set
     var isJumping: Boolean = false
         private set
+    var jumpAirTimer: Float = 0f
+        private set
     var isSliding: Boolean = false
         private set
     var slideTimer: Float = 0f
@@ -101,6 +103,7 @@ class PlayerController(var characterData: CharacterData = CharacterData.RUNNER) 
         velocityY = 0f
         isGrounded = true
         isJumping = false
+        jumpAirTimer = 0f
         isSliding = false
         slideTimer = 0f
         stridePhase = 0f
@@ -153,6 +156,7 @@ class PlayerController(var characterData: CharacterData = CharacterData.RUNNER) 
             velocityY = GameConstants.JUMP_VELOCITY * characterData.jumpModifier
             isGrounded = false
             isJumping = true
+            jumpAirTimer = 0f
             updateCollider()
             return true
         }
@@ -165,7 +169,7 @@ class PlayerController(var characterData: CharacterData = CharacterData.RUNNER) 
             slideTimer = GameConstants.SLIDE_DURATION * characterData.slideModifier
             if (!isGrounded) {
                 // Dive roll down quickly if swiping down mid-air
-                velocityY = -18.0f
+                velocityY = -26.0f
             }
             updateCollider()
             return true
@@ -173,7 +177,7 @@ class PlayerController(var characterData: CharacterData = CharacterData.RUNNER) 
         return false
     }
 
-    fun update(dt: Float) {
+    fun update(dt: Float, verticalDt: Float = dt) {
         // Cooldown and ability timers
         if (abilityCooldownTimer > 0f) {
             abilityCooldownTimer -= dt
@@ -204,23 +208,39 @@ class PlayerController(var characterData: CharacterData = CharacterData.RUNNER) 
 
         // Vertical physics
         if (!isGrounded) {
-            velocityY += GameConstants.GRAVITY * dt
-            y += velocityY * dt
+            jumpAirTimer += verticalDt
 
-            if (y <= surfaceY) {
+            // Asymmetric gravity: standard rising, 1.35x snappier falling for crisp arcade jump feel
+            val gravityMult = if (velocityY < 0f) 1.35f else 1.0f
+            velocityY += GameConstants.GRAVITY * gravityMult * verticalDt
+
+            // Airborne safety: if airborne > 0.48s, accelerate descent
+            if (jumpAirTimer > 0.48f && velocityY > -22.0f) {
+                velocityY = -22.0f
+            }
+
+            y += velocityY * verticalDt
+
+            // Landing check or hard airborne timeout:
+            // Under any circumstance (slow-mo, frame clamping, terrain edge),
+            // a jump CANNOT remain suspended in air past 0.60 seconds.
+            if (y <= surfaceY || jumpAirTimer >= 0.60f) {
                 y = surfaceY
                 velocityY = 0f
                 isGrounded = true
                 isJumping = false
+                jumpAirTimer = 0f
             }
         } else {
+            jumpAirTimer = 0f
             // Smoothly track changing surface elevation (ramps and overpasses)
             if (y < surfaceY) {
-                y = min(surfaceY, y + 24.0f * dt)
+                y = min(surfaceY, y + 24.0f * verticalDt)
             } else if (y > surfaceY + 0.15f) {
                 // Ground dropped beneath runner (e.g. exiting elevated overpass) -> initiate immediate descent
                 isGrounded = false
-                velocityY = -14.0f
+                velocityY = -18.0f
+                jumpAirTimer = 0f
             } else {
                 y = surfaceY
             }

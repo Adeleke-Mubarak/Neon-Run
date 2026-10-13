@@ -102,4 +102,35 @@ class PlayerControllerTest {
         // Speed should accelerate
         assertTrue(player.speed > initialSpeed)
     }
+
+    @Test
+    fun testJumpAirTimeCeilingAndSnappyLanding() {
+        assertTrue(player.jump())
+        assertTrue(player.isJumping)
+        assertFalse(player.isGrounded)
+
+        // Simulate flight: within 0.55s, runner should have peaked and returned near ground
+        var totalDt = 0f
+        while (!player.isGrounded && totalDt < 0.65f) {
+            player.update(0.016f)
+            totalDt += 0.016f
+        }
+
+        // Runner must be safely grounded and not suspended
+        assertTrue("Runner should have landed within 0.60s without mid-air hang", player.isGrounded)
+        assertFalse(player.isJumping)
+        assertEquals(0f, player.jumpAirTimer, 0.001f)
+    }
+
+    @Test
+    fun testMidAirSlideDiveRoll() {
+        assertTrue(player.jump())
+        player.update(0.1f) // Ascend slightly
+        assertTrue(player.isJumping)
+
+        // Mid-air swipe down should trigger dive roll
+        assertTrue(player.slide())
+        assertTrue(player.isSliding)
+        assertTrue("Dive roll velocity should be sharply negative", player.velocityY <= -26.0f)
+    }
 }
