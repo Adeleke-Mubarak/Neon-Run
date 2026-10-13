@@ -75,7 +75,12 @@ class CharacterModelRenderer(context: Context, modelAssetPath: String = "models/
                 activeController.play("Idle", loop = true, speed = 1.0f)
             }
             isSliding -> {
-                activeController.play("Slide", loop = false, speed = 1.9f, startTime = 0.18f, blendDuration = 0.08f)
+                if (activeController.isFinished) {
+                    val runPace = (speed / 13.0f).coerceIn(0.85f, 2.2f)
+                    activeController.play("Run", loop = true, speed = runPace, blendDuration = 0.08f)
+                } else {
+                    activeController.play("Slide", loop = false, speed = 2.65f, startTime = 0.15f, blendDuration = 0.08f)
+                }
             }
             isJumping -> {
                 if (activeController.isFinished) {

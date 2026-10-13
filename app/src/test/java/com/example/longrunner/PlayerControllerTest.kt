@@ -133,4 +133,23 @@ class PlayerControllerTest {
         assertTrue(player.isSliding)
         assertTrue("Dive roll velocity should be sharply negative", player.velocityY <= -26.0f)
     }
+
+    @Test
+    fun testSlideDurationWithTimeDilation() {
+        assertTrue(player.slide())
+        assertTrue(player.isSliding)
+
+        // Under 0.50x time dilation, effectiveDt is halved, but verticalDt is real frame time
+        val timeDilation = 0.50f
+        val frameDt = 0.016f
+        var totalRealTime = 0f
+        while (player.isSliding && totalRealTime < 0.70f) {
+            player.update(dt = frameDt * timeDilation, verticalDt = frameDt)
+            totalRealTime += frameDt
+        }
+
+        // Slide must complete in normal arcade time (~0.52s) and NEVER drag for 2 seconds
+        assertFalse("Slide should have completed without 2-second drag", player.isSliding)
+        assertTrue(totalRealTime <= 0.55f)
+    }
 }

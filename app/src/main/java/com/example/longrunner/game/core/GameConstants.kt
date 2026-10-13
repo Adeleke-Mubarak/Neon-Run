@@ -26,7 +26,7 @@ object GameConstants {
     // Jump & Slide physics
     const val JUMP_VELOCITY = 13.2f
     const val GRAVITY = -48.0f
-    const val SLIDE_DURATION = 0.75f // seconds
+    const val SLIDE_DURATION = 0.52f // seconds
     const val GROUND_Y = 0.0f
 
     // Player bounding box (AABB)

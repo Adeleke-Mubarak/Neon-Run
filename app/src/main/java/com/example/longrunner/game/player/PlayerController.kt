@@ -246,9 +246,9 @@ class PlayerController(var characterData: CharacterData = CharacterData.RUNNER) 
             }
         }
 
-        // Slide timer
+        // Slide timer (uses real-time verticalDt so sliding never drags or hangs during slow-motion)
         if (isSliding) {
-            slideTimer -= dt
+            slideTimer -= verticalDt
             if (slideTimer <= 0f) {
                 isSliding = false
                 slideTimer = 0f

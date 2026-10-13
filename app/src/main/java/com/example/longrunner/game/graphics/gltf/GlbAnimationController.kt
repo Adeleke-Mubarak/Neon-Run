@@ -173,6 +173,15 @@ class GlbAnimationController(private val model: GlbModel) {
                             tz = baselineZ + excessZ * 0.25f
                         }
 
+                        // Lock forward root motion on Hips bone during Slide:
+                        // runner3.glb's Hips contains +5.64m forward root translation along local Y (from 4.63 to 568.44).
+                        // Physical forward progression is driven by GameEngine (z -= speed * dt).
+                        // Keeping Y at baseline (4.63f) keeps the slide in-place, eliminating the forward drag
+                        // and snapping glitch.
+                        if (anim.name == "Slide" && model.nodes[nodeIdx].name == "mixamorig:Hips") {
+                            ty = 4.63f
+                        }
+
                         nodeTranslations[nodeIdx][0] = tx
                         nodeTranslations[nodeIdx][1] = ty
                         nodeTranslations[nodeIdx][2] = tz
