@@ -28,14 +28,15 @@ data class HoverboardData(
     val primaryColorHex: Long,
     val accentColorHex: Long,
     val primaryMaterial: Material,
-    val accentMaterial: Material
+    val accentMaterial: Material,
+    val modelAssetPath: String = "models/skateboard_classic.glb"
 ) {
     companion object {
         val VECTOR_GLIDE = HoverboardData(
             id = "vector_glide",
-            name = "Vector Glide",
+            name = "Classic Street Board",
             modelCode = "VG-01",
-            description = "Standard-issue agile cyber deck with dual cyan plasma thrusters.",
+            description = "Authentic street skateboard with standard trucks and high-rebound urethane wheels.",
             rarity = HoverboardRarity.CORE,
             costCredits = 0, // Lowest Value: Unlocked by default from start
             durationSeconds = 12.0f,
@@ -46,14 +47,15 @@ data class HoverboardData(
             primaryColorHex = 0xFF00F0FF, // Cyan
             accentColorHex = 0xFFFFFFFF,
             primaryMaterial = Material.POWERUP_HOVERBOARD_CYAN,
-            accentMaterial = Material.POWERUP_HOVERBOARD_MAGENTA
+            accentMaterial = Material.POWERUP_HOVERBOARD_MAGENTA,
+            modelAssetPath = "models/skateboard_classic.glb"
         )
 
         val PULSE_STRIKER = HoverboardData(
             id = "pulse_striker",
-            name = "Pulse Striker",
+            name = "Cyber Cruiser Board",
             modelCode = "PS-09",
-            description = "Aerodynamic emerald cruiser with reinforced kinetic stabilizers.",
+            description = "Carving cruiser skateboard with widened undercarriage and kinetic stabilizers.",
             rarity = HoverboardRarity.RARE,
             costCredits = 1500, // Value: 1,500 Credits
             durationSeconds = 14.0f,
@@ -64,14 +66,15 @@ data class HoverboardData(
             primaryColorHex = 0xFF00FF88, // Neon Green
             accentColorHex = 0xFF00F0FF,
             primaryMaterial = Material(0.0f, 1.0f, 0.55f, 1f, 0.95f),
-            accentMaterial = Material(0.0f, 0.95f, 1.0f, 1f, 0.95f)
+            accentMaterial = Material(0.0f, 0.95f, 1.0f, 1f, 0.95f),
+            modelAssetPath = "models/skateboard_cruiser.glb"
         )
 
         val VORTEX_MIRAGE = HoverboardData(
             id = "vortex_mirage",
-            name = "Vortex Mirage",
+            name = "Speed Demon Pro",
             modelCode = "VM-X4",
-            description = "High-octane plasma deck leaving a blinding magenta wake trail.",
+            description = "High-performance pro contest board engineered for maximum velocity and aerial responsiveness.",
             rarity = HoverboardRarity.RARE,
             costCredits = 4000, // Value: 4,000 Credits
             durationSeconds = 16.0f,
@@ -82,14 +85,15 @@ data class HoverboardData(
             primaryColorHex = 0xFFFF007F, // Neon Magenta
             accentColorHex = 0xFFFFD700,
             primaryMaterial = Material(1.0f, 0.0f, 0.55f, 1f, 0.95f),
-            accentMaterial = Material(1.0f, 0.84f, 0.0f, 1f, 0.95f)
+            accentMaterial = Material(1.0f, 0.84f, 0.0f, 1f, 0.95f),
+            modelAssetPath = "models/skateboard_pro.glb"
         )
 
         val APEX_PHANTOM = HoverboardData(
             id = "apex_phantom",
-            name = "Apex Phantom",
+            name = "Supreme Red Edition",
             modelCode = "AP-99",
-            description = "Military stealth hovercraft with dual antimatter warp turbines.",
+            description = "Iconic bold red Supreme pro skateboard with premium trucks and grip tape.",
             rarity = HoverboardRarity.EPIC,
             costCredits = 8500, // Value: 8,500 Credits
             durationSeconds = 18.0f,
@@ -100,14 +104,15 @@ data class HoverboardData(
             primaryColorHex = 0xFFB026FF, // Neon Violet
             accentColorHex = 0xFF00F0FF,
             primaryMaterial = Material(0.70f, 0.15f, 1.0f, 1f, 0.95f),
-            accentMaterial = Material(0.0f, 0.95f, 1.0f, 1f, 0.95f)
+            accentMaterial = Material(0.0f, 0.95f, 1.0f, 1f, 0.95f),
+            modelAssetPath = "models/skateboard_supreme.glb"
         )
 
         val HYPERION_PRIME = HoverboardData(
             id = "hyperion_prime",
-            name = "Hyperion Prime",
+            name = "Supreme Gold Edition",
             modelCode = "HP-OMEGA",
-            description = "The pinnacle of Cyber Vault tech. Golden solar plasma deck with omni-siphon field.",
+            description = "The pinnacle of Cyber Vault tech. Golden solar deck with omni-siphon field.",
             rarity = HoverboardRarity.LEGENDARY,
             costCredits = 16000, // Highest Value: 16,000 Credits
             durationSeconds = 22.0f,
@@ -118,7 +123,8 @@ data class HoverboardData(
             primaryColorHex = 0xFFFFD700, // Neon Gold
             accentColorHex = 0xFFFF007F,
             primaryMaterial = Material(1.0f, 0.85f, 0.0f, 1f, 0.95f),
-            accentMaterial = Material(1.0f, 0.0f, 0.55f, 1f, 0.95f)
+            accentMaterial = Material(1.0f, 0.0f, 0.55f, 1f, 0.95f),
+            modelAssetPath = "models/skateboard_supreme.glb"
         )
 
         val ALL = listOf(VECTOR_GLIDE, PULSE_STRIKER, VORTEX_MIRAGE, APEX_PHANTOM, HYPERION_PRIME)

@@ -62,6 +62,7 @@ class Renderer3D(
     private var playerVisual: PlayerVisual? = null
     private var characterModelRenderer: com.example.longrunner.game.graphics.gltf.CharacterModelRenderer? = null
     private var subwayEnvRenderer: com.example.longrunner.game.graphics.gltf.SubwayEnvironmentRenderer? = null
+    private var skateboardModelRenderer: com.example.longrunner.game.graphics.gltf.SkateboardModelRenderer? = null
 
     private val modelMatrix = Matrix4()
     private val mvpMatrix = Matrix4()
@@ -148,6 +149,11 @@ class Renderer3D(
                 subwayEnvRenderer = com.example.longrunner.game.graphics.gltf.SubwayEnvironmentRenderer(ctx)
             } catch (e: Exception) {
                 android.util.Log.e("Renderer3D", "Error initializing SubwayEnvironmentRenderer", e)
+            }
+            try {
+                skateboardModelRenderer = com.example.longrunner.game.graphics.gltf.SkateboardModelRenderer(ctx)
+            } catch (e: Exception) {
+                android.util.Log.e("Renderer3D", "Error initializing SkateboardModelRenderer", e)
             }
         }
         engine.particleSystem.initGl()
@@ -376,6 +382,35 @@ class Renderer3D(
             }
         }
 
+        // Render 3D Authentic Skateboard Model under runner's feet when surfing
+        var rendered3DSkateboard = false
+        if (engine.powerUpManager.isHoverboardActive) {
+            val equippedBoard = engine.hoverboardManager.getEquippedHoverboard()
+            val sbRenderer = skateboardModelRenderer
+            if (sbRenderer != null) {
+                rendered3DSkateboard = sbRenderer.render(
+                    vpMatrix = camera.viewProjectionMatrix,
+                    x = engine.player.x,
+                    y = engine.player.y,
+                    z = engine.player.z,
+                    speed = engine.player.speed,
+                    isJumping = engine.player.isJumping,
+                    isSliding = engine.player.isSliding,
+                    stridePhase = engine.player.stridePhase,
+                    dt = dtSec,
+                    cameraX = camera.position.x,
+                    cameraY = camera.position.y,
+                    cameraZ = camera.position.z,
+                    fogR = fogR,
+                    fogG = fogG,
+                    fogB = fogB,
+                    fogDensity = scaledFogDensity,
+                    phaseTransition = phaseTransition,
+                    boardData = equippedBoard
+                )
+            }
+        }
+
         // Render Realistic 3D Skinned Model (with procedural fallback)
         val rendered3DModel = if (modelRenderer != null && modelRenderer.isLoaded) {
             val rendered = modelRenderer.render(
@@ -417,7 +452,7 @@ class Renderer3D(
                     hasShield = engine.powerUpManager.hasShield,
                     isOverdrive = engine.powerUpManager.isOverdriveActive,
                     isMagnet = engine.powerUpManager.isMagnetActive,
-                    isHoverboard = engine.powerUpManager.isHoverboardActive,
+                    isHoverboard = engine.powerUpManager.isHoverboardActive && !rendered3DSkateboard,
                     isSliding = engine.player.isSliding,
                     isJumping = engine.player.isJumping,
                     stridePhase = engine.player.stridePhase
@@ -443,7 +478,7 @@ class Renderer3D(
                 hasShield = engine.powerUpManager.hasShield,
                 isOverdrive = engine.powerUpManager.isOverdriveActive,
                 isMagnet = engine.powerUpManager.isMagnetActive,
-                isHoverboard = engine.powerUpManager.isHoverboardActive
+                isHoverboard = engine.powerUpManager.isHoverboardActive && !rendered3DSkateboard
             )
         }
 
@@ -510,6 +545,7 @@ class Renderer3D(
 
         characterModelRenderer?.release()
         subwayEnvRenderer?.release()
+        skateboardModelRenderer?.release()
         playerVisual?.release()
         engine.particleSystem.release()
     }

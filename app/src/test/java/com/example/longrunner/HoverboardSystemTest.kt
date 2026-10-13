@@ -182,4 +182,20 @@ class HoverboardSystemTest {
         // Shards should drastically outnumber magnets (>15x)
         assertTrue("Energy shards ($shardCount) should vastly outnumber rare magnets ($magnetCount)", shardCount > magnetCount * 5)
     }
+
+    @Test
+    fun testSkateboard3DModelAssetPathsAreConfigured() {
+        for (board in HoverboardData.ALL) {
+            assertNotNull("Board ${board.name} must have a 3D model asset path", board.modelAssetPath)
+            assertTrue("Board ${board.name} model path must point to models/ directory", board.modelAssetPath.startsWith("models/"))
+            assertTrue("Board ${board.name} model path must be a .glb file", board.modelAssetPath.endsWith(".glb"))
+        }
+
+        // Verify distinct authentic skateboard models
+        assertEquals("models/skateboard_classic.glb", HoverboardData.VECTOR_GLIDE.modelAssetPath)
+        assertEquals("models/skateboard_cruiser.glb", HoverboardData.PULSE_STRIKER.modelAssetPath)
+        assertEquals("models/skateboard_pro.glb", HoverboardData.VORTEX_MIRAGE.modelAssetPath)
+        assertEquals("models/skateboard_supreme.glb", HoverboardData.APEX_PHANTOM.modelAssetPath)
+        assertEquals("models/skateboard_supreme.glb", HoverboardData.HYPERION_PRIME.modelAssetPath)
+    }
 }

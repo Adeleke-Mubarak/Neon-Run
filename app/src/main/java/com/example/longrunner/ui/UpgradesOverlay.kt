@@ -75,7 +75,7 @@ fun UpgradesOverlay(
                         letterSpacing = 2.sp
                     )
                     Text(
-                        text = if (selectedTab == VaultTab.POWERUPS) "FIELD POWER-UP UPGRADES" else "HOVERBOARD HANGAR",
+                        text = if (selectedTab == VaultTab.POWERUPS) "FIELD POWER-UP UPGRADES" else "SKATEBOARD HANGAR",
                         color = if (selectedTab == VaultTab.POWERUPS) NeonCyan else NeonGold,
                         fontSize = 11.sp,
                         fontWeight = FontWeight.Bold,
@@ -154,7 +154,7 @@ fun UpgradesOverlay(
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = "🛹 HOVERBOARDS",
+                        text = "🛹 SKATEBOARDS",
                         color = if (isBoardsActive) NeonGold else Color.LightGray,
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Black,
@@ -430,7 +430,7 @@ fun HoverboardDeckCard(
                             modifier = Modifier.height(36.dp)
                         ) {
                             Text(
-                                text = "EQUIP DECK",
+                                text = "EQUIP BOARD",
                                 color = Color.Black,
                                 fontSize = 10.5.sp,
                                 fontWeight = FontWeight.Black,

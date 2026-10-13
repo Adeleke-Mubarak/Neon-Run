@@ -702,7 +702,7 @@ fun HoverboardButton(
             Spacer(modifier = Modifier.width(6.dp))
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(
-                    text = if (isActive) "SURFING" else "HOVERBOARD",
+                    text = if (isActive) "SKATING" else "SKATEBOARD",
                     color = if (isActive) Color.White else boardColor,
                     fontSize = 10.sp,
                     fontWeight = FontWeight.Black,
