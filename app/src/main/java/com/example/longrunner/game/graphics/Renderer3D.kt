@@ -430,7 +430,8 @@ class Renderer3D(
                 fogG = fogG,
                 fogB = fogB,
                 fogDensity = scaledFogDensity,
-                phaseTransition = phaseTransition
+                phaseTransition = phaseTransition,
+                isHoverboard = engine.powerUpManager.isHoverboardActive
             )
             if (rendered) {
                 // Re-bind activeShader for power-up VFX and following meshes

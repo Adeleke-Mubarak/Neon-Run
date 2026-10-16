@@ -63,7 +63,8 @@ class CharacterModelRenderer(context: Context, modelAssetPath: String = "models/
         fogG: Float = 0.03f,
         fogB: Float = 0.08f,
         fogDensity: Float = 0.008f,
-        phaseTransition: Float = 0f
+        phaseTransition: Float = 0f,
+        isHoverboard: Boolean = false
     ): Boolean {
         val activeModel = model ?: return false
         val activeController = controller ?: return false
@@ -76,19 +77,34 @@ class CharacterModelRenderer(context: Context, modelAssetPath: String = "models/
             }
             isSliding -> {
                 if (activeController.isFinished) {
-                    val runPace = (speed / 13.0f).coerceIn(0.85f, 2.2f)
-                    activeController.play("Run", loop = true, speed = runPace, blendDuration = 0.08f)
+                    if (isHoverboard) {
+                        val anim = if (activeModel.animations.containsKey("Glide")) "Glide" else "Idle"
+                        activeController.play(anim, loop = true, speed = 1.0f, blendDuration = 0.08f)
+                    } else {
+                        val runPace = (speed / 13.0f).coerceIn(0.85f, 2.2f)
+                        activeController.play("Run", loop = true, speed = runPace, blendDuration = 0.08f)
+                    }
                 } else {
                     activeController.play("Slide", loop = false, speed = 2.65f, startTime = 0.15f, blendDuration = 0.08f)
                 }
             }
             isJumping -> {
                 if (activeController.isFinished) {
-                    val runPace = (speed / 13.0f).coerceIn(0.85f, 2.2f)
-                    activeController.play("Run", loop = true, speed = runPace, blendDuration = 0.08f)
+                    if (isHoverboard) {
+                        val anim = if (activeModel.animations.containsKey("Glide")) "Glide" else "Idle"
+                        activeController.play(anim, loop = true, speed = 1.0f, blendDuration = 0.08f)
+                    } else {
+                        val runPace = (speed / 13.0f).coerceIn(0.85f, 2.2f)
+                        activeController.play("Run", loop = true, speed = runPace, blendDuration = 0.08f)
+                    }
                 } else {
                     activeController.play("Jump", loop = false, speed = 1.85f, startTime = 0.05f, blendDuration = 0.06f)
                 }
+            }
+            isHoverboard -> {
+                // Skateboard gliding stance: feet planted on deck surfing down the subway tracks
+                val anim = if (activeModel.animations.containsKey("Glide")) "Glide" else "Idle"
+                activeController.play(anim, loop = true, speed = 1.0f, blendDuration = 0.12f)
             }
             else -> {
                 val runPace = (speed / 13.0f).coerceIn(0.85f, 2.2f)
@@ -100,8 +116,9 @@ class CharacterModelRenderer(context: Context, modelAssetPath: String = "models/
 
         // Compute Transform Matrix
         modelMatrix.identity()
-        // Position character: y is track surface (mocap skeleton drops to ground during slide naturally)
-        modelMatrix.translate(x, y, z)
+        // Position character: when riding hoverboard/skateboard, elevate by deck thickness (0.11m) so shoes rest on top
+        val charY = if (isHoverboard) y + 0.11f else y
+        modelMatrix.translate(x, charY, z)
         val isToonModel = currentAssetPath?.contains("character_endless_runner") == true
         if (isToonModel) {
             // Sketchfab OBJ to GLB conversion: Z-up to Y-up rotation and scale from cm to meters

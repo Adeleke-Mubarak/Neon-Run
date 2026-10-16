@@ -76,10 +76,10 @@ class SkateboardModelRenderer(private val context: Context) {
         val model = modelCache[boardData.modelAssetPath] ?: loadModel(boardData.modelAssetPath) ?: return false
 
         // Compute skateboard position and tilt under runner's feet
-        val boardFloatY = kotlin.math.sin(animTime * 8.0f) * 0.02f
-        val boardY = y + 0.04f + boardFloatY
-        val boardPitch = if (isSliding) -14f else if (isJumping) -8f else 2.5f
-        val boardRoll = kotlin.math.sin(stridePhase * 1.0f) * 4.0f
+        val boardFloatY = kotlin.math.sin(animTime * 6.0f) * 0.008f
+        val boardY = y + 0.01f + boardFloatY
+        val boardPitch = if (isJumping) -6.0f else 0.0f
+        val boardRoll = kotlin.math.sin(animTime * 3.5f) * 1.5f
 
         modelMatrix.identity()
         modelMatrix.translate(x, boardY, z)
